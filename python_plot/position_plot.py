@@ -12,9 +12,11 @@ from collections import OrderedDict
 in_file = open("./xy_measures15.txt","r")
 x_list = []
 y_list = []
+circ_x = []
+circ_y = []
 
 # prepare a figure for nPlot x 1 plots
-nPlot = 3
+nPlot = 4
 plot = 0
 figure = plt.figure()
 gs = gridspec.GridSpec(nPlot, 1)
@@ -119,17 +121,57 @@ for x, y in zip(x_list, y_list):
         )
         k = k + 1
 
-# scale points to emulate the final result as the game will elaborate the circuit
-scale = 1
-for i in range(len(x_list)):
-    if x_list[i] >= 0:
-        x_list[i] = np.floor(x_list[i] / scale)
+# remove 0 distance points
+r_indexes = []
+j = 0
+for i in xrange(1, len(x_list) - 1):
+    distance = math.hypot(x_list[i] - x_list[j], y_list[i] - y_list[j])
+    if distance == 0:
+        r_indexes.append(i)
     else:
-        x_list[i] = np.ceil(x_list[i] / scale)
-    if y_list[i] >= 0:
-        y_list[i] = np.floor(y_list[i] / scale)
-    else:
+        j = i
 
-        y_list[i] = np.ceil(y_list[i] / scale)
+for i in reversed(r_indexes):
+    x_list.pop(i)
+    y_list.pop(i)
+
+# evaluate the tile dimension
+min_dist = math.hypot(x_list[1] - x_list[0], y_list[1] - y_list[0])
+max_dist = min_dist
+for i in xrange(2, len(x_list) - 1):
+    distance = math.hypot(x_list[i] - x_list[i-1], y_list[i] - y_list[i-1])
+    if distance < min_dist:
+        min_dist = distance
+    elif distance > max_dist:
+        max_dist = distance
+print(min_dist)
+print(max_dist)
+tileDimension = max_dist / min_dist
+
+# scale points in a good way
+circ_x.append(x_list[0])
+circ_y.append(y_list[0])
+for i in xrange(1, len(x_list) - 1):
+    newX = circ_x[i-1] + np.floor((x_list[i] - x_list[i-1]) / tileDimension)
+    circ_x.append(newX)
+    newY = circ_y[i-1] + np.floor((y_list[i] - y_list[i-1]) / tileDimension)
+    circ_y.append(newY)
+
+# the third plot shows the data with the elimination of wrong change in direction
+ax4 = figure.add_subplot(gs[plot])
+ax4.plot(circ_x, circ_y, 'ro', circ_x, circ_y, 'r-')
+plot = plot + 1
+seen = []
+k = 1
+for x, y in zip(circ_x, circ_y):
+    if [x, y] not in seen:
+        seen.append([x, y])
+        ax4.annotate(
+            'point{0}'.format(k),
+            xy=(x, y), xytext=(-20, 20),
+            textcoords='offset points', ha='right', va='bottom',
+            bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
+        )
+        k = k + 1
 
 plt.show()
