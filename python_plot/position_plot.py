@@ -7,16 +7,23 @@ import re
 import math
 from collections import OrderedDict
 
+def round_zero(val):
+    if val > 0:
+        return np.floor(val)
+    elif val < 0:
+        return np.ceil(val)
+    else:
+        return val;
 
 # open file with data and plot them
-in_file = open("./xy_measures15.txt","r")
+in_file = open("./xy_measures17.txt","r")
 x_list = []
 y_list = []
 circ_x = []
 circ_y = []
 
 # prepare a figure for nPlot x 1 plots
-nPlot = 4
+nPlot = 5
 plot = 0
 figure = plt.figure()
 gs = gridspec.GridSpec(nPlot, 1)
@@ -26,8 +33,8 @@ entry = in_file.readline()
 while len(entry) > 1:
     if entry.startswith("x"):
         [x,y] = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[\.]?\d*(?:[eE][-+]?\d+)?", entry)
-        x_list.append(np.floor(float(x)))
-        y_list.append(np.floor(float(y)))
+        y_list.append(round_zero(float(y)))
+        x_list.append(round_zero(float(x)))
     entry = in_file.readline()
 in_file.close()
 
@@ -146,15 +153,15 @@ for i in xrange(2, len(x_list) - 1):
         max_dist = distance
 print(min_dist)
 print(max_dist)
-tileDimension = max_dist / min_dist
+tileDimension = max_dist / min_dist / 2
 
 # scale points in a good way
 circ_x.append(x_list[0])
 circ_y.append(y_list[0])
 for i in xrange(1, len(x_list) - 1):
-    newX = circ_x[i-1] + np.floor((x_list[i] - x_list[i-1]) / tileDimension)
+    newX = circ_x[i-1] + round_zero((x_list[i] - x_list[i-1]) / tileDimension)
     circ_x.append(newX)
-    newY = circ_y[i-1] + np.floor((y_list[i] - y_list[i-1]) / tileDimension)
+    newY = circ_y[i-1] + round_zero((y_list[i] - y_list[i-1]) / tileDimension)
     circ_y.append(newY)
 
 # the third plot shows the data with the elimination of wrong change in direction
@@ -173,5 +180,44 @@ for x, y in zip(circ_x, circ_y):
             bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
         )
         k = k + 1
+
+# the fourth plot shows data obtained with the elimination of useless data:
+# if a point doesn't change the direction to be taken, it is useless to keep it in memory
+r_indexes = []
+j = 1
+# first direction in between p0 and p1
+a0 = math.degrees(math.pi + math.atan2(circ_y[1]-circ_y[0], circ_x[1]-circ_x[0]))
+for i in xrange(2, len(circ_x) - 1):
+    # evaluate the angle respect to the previous point
+    a = math.degrees(math.pi + math.atan2(circ_y[i]-circ_y[j], circ_x[i]-circ_x[j]))
+    # if the angle is too high, that point will be deleted
+    if a == a0:
+        r_indexes.append(i - 1)
+    else:
+        a0 = a
+        j = i
+
+for i in reversed(r_indexes):
+    circ_x.pop(i)
+    circ_y.pop(i)
+
+# the third plot shows the data with the elimination of wrong change in direction
+ax5 = figure.add_subplot(gs[plot])
+ax5.plot(circ_x, circ_y, 'ro', circ_x, circ_y, 'r-')
+plot = plot + 1
+seen = []
+k = 1
+for x, y in zip(circ_x, circ_y):
+    if [x, y] not in seen:
+        seen.append([x, y])
+        ax5.annotate(
+            'point{0}'.format(k),
+            xy=(x, y), xytext=(-20, 20),
+            textcoords='offset points', ha='right', va='bottom',
+            bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
+        )
+        k = k + 1
+
+
 
 plt.show()
