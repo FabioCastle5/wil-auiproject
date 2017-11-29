@@ -38,6 +38,18 @@ while len(entry) > 1:
     entry = in_file.readline()
 in_file.close()
 
+# remove the overlapping points
+r_indexes = []
+j = 0
+for i in xrange(1, len(x_list) - 1):
+    if (x_list[i] - x_list[j] == 0) and (y_list[i] - y_list[j] == 0):
+        r_indexes.append(i)
+    else:
+        j = i
+
+for i in reversed(r_indexes):
+    x_list.pop(i)
+    y_list.pop(i)
 
 # the first plot shows the raw data, without any compensations
 ax1 = figure.add_subplot(gs[plot])
@@ -128,32 +140,26 @@ for x, y in zip(x_list, y_list):
         )
         k = k + 1
 
-# remove 0 distance points
-r_indexes = []
-j = 0
+# # evaluate the tile dimension
+# min_dist = math.hypot(x_list[1] - x_list[0], y_list[1] - y_list[0])
+# max_dist = min_dist
+# for i in xrange(2, len(x_list) - 1):
+#     distance = math.hypot(x_list[i] - x_list[i-1], y_list[i] - y_list[i-1])
+#     if distance < min_dist:
+#         min_dist = distance
+#     elif distance > max_dist:
+#         max_dist = distance
+# print(min_dist)
+# print(max_dist)
+# tileDimension = max_dist / min_dist / 2
+
+mean_dist = math.hypot(x_list[1] - x_list[0], y_list[1] - y_list[0])
 for i in xrange(1, len(x_list) - 1):
-    distance = math.hypot(x_list[i] - x_list[j], y_list[i] - y_list[j])
-    if distance == 0:
-        r_indexes.append(i)
-    else:
-        j = i
-
-for i in reversed(r_indexes):
-    x_list.pop(i)
-    y_list.pop(i)
-
-# evaluate the tile dimension
-min_dist = math.hypot(x_list[1] - x_list[0], y_list[1] - y_list[0])
-max_dist = min_dist
-for i in xrange(2, len(x_list) - 1):
+    n = i + 1
     distance = math.hypot(x_list[i] - x_list[i-1], y_list[i] - y_list[i-1])
-    if distance < min_dist:
-        min_dist = distance
-    elif distance > max_dist:
-        max_dist = distance
-print(min_dist)
-print(max_dist)
-tileDimension = max_dist / min_dist / 2
+    mean_dist = (distance + mean_dist * i) / n
+print(mean_dist)
+tileDimension = mean_dist
 
 # scale points in a good way
 circ_x.append(x_list[0])
