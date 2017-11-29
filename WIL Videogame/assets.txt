@@ -1,0 +1,40 @@
+Sprites:
+    Player:
+        1) facing NE
+        2) facing NW
+        3) facing SE
+        4) facing SW
+
+Tiles:
+    Swamp:
+        1) Road 0°
+        2) Road 45°
+        3) Road 90°
+        4) Road 135°
+        5) Road 180°
+        6) Road 225°
+        7) Road 270°
+        8) Road 315°
+        9) Road 360°
+        10) Upward turn right
+        11) Upward turn left
+        12) Rightward turn up
+        13) Rightward turn down
+        14) Leftward turn up
+        15) Leftward turn down
+        16) Downward turn right
+        17) Downward turn left
+    Map:
+        1) Map
+        2) Pointers
+    Various fancy elements
+
+UI:
+    1) Player avatar
+    2) "Completed" bar
+    3) Points & Pause button
+
+Screens
+    1) Loading
+    2) Circuit building
+    3) Pause
