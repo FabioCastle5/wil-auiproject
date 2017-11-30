@@ -179,8 +179,8 @@ for i in xrange(1, len(x_list) - 1):
             deltaY = 0
         else:
             deltaY = scale_module * math.sin(math.radians(angle))
-        circ_x.append(x_list[j] + deltaX)
-        circ_y.append(y_list[j] + deltaY)
+        circ_x.append(round_zero(x_list[j] + deltaX))
+        circ_y.append(round_zero(y_list[j] + deltaY))
         j = i
 
 
