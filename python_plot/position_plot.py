@@ -16,14 +16,14 @@ def round_zero(val):
         return val;
 
 # open file with data and plot them
-in_file = open("./xy_measures17.txt","r")
+in_file = open("./xy_measures16.txt","r")
 x_list = []
 y_list = []
 circ_x = []
 circ_y = []
 
 # prepare a figure for nPlot x 1 plots
-nPlot = 5
+nPlot = 4
 plot = 0
 figure = plt.figure()
 gs = gridspec.GridSpec(nPlot, 1)
@@ -62,7 +62,7 @@ for x, y in zip(x_list, y_list):
         seen.append([x, y])
         ax1.annotate(
             'point{0}'.format(k),
-            xy=(x, y), xytext=(-20, 20),
+            xy=(x, y), xytext=(-5, 5),
             textcoords='offset points', ha='right', va='bottom',
             bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
         )
@@ -74,10 +74,10 @@ r_indexes = []
 max_angle = 90
 j = 1
 # first direction in between p0 and p1
-a0 = math.degrees(math.pi + math.atan2(y_list[1]-y_list[0], x_list[1]-x_list[0]))
+a0 = math.degrees(math.atan2(y_list[1]-y_list[0], x_list[1]-x_list[0]))
 for i in xrange(2, len(x_list) - 1):
     # evaluate the angle respect to the previous point
-    a = math.degrees(math.pi + math.atan2(y_list[i]-y_list[j], x_list[i]-x_list[j]))
+    a = math.degrees(math.atan2(y_list[i]-y_list[j], x_list[i]-x_list[j]))
     # if the angle is too high, that point will be deleted
     if abs(a - a0) > max_angle:
         r_indexes.append(i)
@@ -100,7 +100,7 @@ for x, y in zip(x_list, y_list):
         seen.append([x, y])
         ax2.annotate(
             'point{0}'.format(k),
-            xy=(x, y), xytext=(-20, 20),
+            xy=(x, y), xytext=(-5, 5),
             textcoords='offset points', ha='right', va='bottom',
             bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
         )
@@ -134,7 +134,7 @@ for x, y in zip(x_list, y_list):
         seen.append([x, y])
         ax3.annotate(
             'point{0}'.format(k),
-            xy=(x, y), xytext=(-20, 20),
+            xy=(x, y), xytext=(-5, 5),
             textcoords='offset points', ha='right', va='bottom',
             bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
         )
@@ -153,24 +153,38 @@ for x, y in zip(x_list, y_list):
 # print(max_dist)
 # tileDimension = max_dist / min_dist / 2
 
+# evaluate the mean distance between the points
+# used to scale the circuit in a tile-like way
 mean_dist = math.hypot(x_list[1] - x_list[0], y_list[1] - y_list[0])
-for i in xrange(1, len(x_list) - 1):
-    n = i + 1
+for i in xrange(2, len(x_list) - 1):
     distance = math.hypot(x_list[i] - x_list[i-1], y_list[i] - y_list[i-1])
-    mean_dist = (distance + mean_dist * i) / n
-print(mean_dist)
-tileDimension = mean_dist
+    mean_dist = (distance + mean_dist * (i - 1)) / i
+print("Mean distance: " + str(mean_dist))
+min_distance = mean_dist
 
 # scale points in a good way
+j = 0
 circ_x.append(x_list[0])
 circ_y.append(y_list[0])
 for i in xrange(1, len(x_list) - 1):
-    newX = circ_x[i-1] + round_zero((x_list[i] - x_list[i-1]) / tileDimension)
-    circ_x.append(newX)
-    newY = circ_y[i-1] + round_zero((y_list[i] - y_list[i-1]) / tileDimension)
-    circ_y.append(newY)
+    module = math.hypot(x_list[i] - x_list[j], y_list[i] - y_list[j])
+    angle = math.degrees(math.atan2(y_list[i]-y_list[j], x_list[i]-x_list[j]))
+    scale_module = round_zero(module / min_distance)
+    if not scale_module == 0:
+        if math.fabs(angle) == 90:
+            deltaX = 0
+        else:
+            deltaX = scale_module * math.cos(math.radians(angle))
+        if (angle == 0) or (math.fabs(angle) == 180):
+            deltaY = 0
+        else:
+            deltaY = scale_module * math.sin(math.radians(angle))
+        circ_x.append(x_list[j] + deltaX)
+        circ_y.append(y_list[j] + deltaY)
+        j = i
 
-# the third plot shows the data with the elimination of wrong change in direction
+
+# the fourth plot shows the data scaled with min_distance
 ax4 = figure.add_subplot(gs[plot])
 ax4.plot(circ_x, circ_y, 'ro', circ_x, circ_y, 'r-')
 plot = plot + 1
@@ -181,49 +195,10 @@ for x, y in zip(circ_x, circ_y):
         seen.append([x, y])
         ax4.annotate(
             'point{0}'.format(k),
-            xy=(x, y), xytext=(-20, 20),
+            xy=(x, y), xytext=(-5, 5),
             textcoords='offset points', ha='right', va='bottom',
             bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
         )
         k = k + 1
-
-# the fourth plot shows data obtained with the elimination of useless data:
-# if a point doesn't change the direction to be taken, it is useless to keep it in memory
-r_indexes = []
-j = 1
-# first direction in between p0 and p1
-a0 = math.degrees(math.pi + math.atan2(circ_y[1]-circ_y[0], circ_x[1]-circ_x[0]))
-for i in xrange(2, len(circ_x) - 1):
-    # evaluate the angle respect to the previous point
-    a = math.degrees(math.pi + math.atan2(circ_y[i]-circ_y[j], circ_x[i]-circ_x[j]))
-    # if the angle is too high, that point will be deleted
-    if a == a0:
-        r_indexes.append(i - 1)
-    else:
-        a0 = a
-        j = i
-
-for i in reversed(r_indexes):
-    circ_x.pop(i)
-    circ_y.pop(i)
-
-# the third plot shows the data with the elimination of wrong change in direction
-ax5 = figure.add_subplot(gs[plot])
-ax5.plot(circ_x, circ_y, 'ro', circ_x, circ_y, 'r-')
-plot = plot + 1
-seen = []
-k = 1
-for x, y in zip(circ_x, circ_y):
-    if [x, y] not in seen:
-        seen.append([x, y])
-        ax5.annotate(
-            'point{0}'.format(k),
-            xy=(x, y), xytext=(-20, 20),
-            textcoords='offset points', ha='right', va='bottom',
-            bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
-        )
-        k = k + 1
-
-
 
 plt.show()

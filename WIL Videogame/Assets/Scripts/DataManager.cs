@@ -2,7 +2,7 @@
 using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
+using System;
 
 public class DataManager : MonoBehaviour {
 
@@ -12,6 +12,7 @@ public class DataManager : MonoBehaviour {
 
 	void Awake() {
 		Debug.Log ("Starting awake");
+		ElaborateRawData ();
 	}
 
 
@@ -30,7 +31,7 @@ public class DataManager : MonoBehaviour {
 	}
 
 
-	private float Hypot(int a, int b) {
+	private float Hypot(float a, float b) {
 		return (float) Mathf.Sqrt(Mathf.Pow(a, 2) + Mathf.Pow(b, 2));
 	}
 
@@ -41,35 +42,17 @@ public class DataManager : MonoBehaviour {
 
 		List<float> xList = new List<float> ();
 		List<float> yList = new List<float> ();
-		List<int> circuitX = new List<int> ();
-		List<int> circuitY = new List<int> ();
+		List<float> circuitX = new List<float> ();
+		List<float> circuitY = new List<float> ();
 
 		string inputPath = AssetDatabase.GetAssetPath (measures);
 		string outputPath = AssetDatabase.GetAssetPath (circuitPoints);
 
 		FileStream inputStream = File.Open (inputPath, FileMode.Open, FileAccess.Read);
+		File.WriteAllText(outputPath, String.Empty);
 		FileStream outputStream = File.Open (outputPath, FileMode.Open, FileAccess.Write);
 		StreamReader reader = new StreamReader (inputStream);
 		StreamWriter writer = new StreamWriter (outputStream);
-		
-//		string pattern = @"[-+]?[.]?[\d]+(?:,\d\d\d)*[\.]?\d*(?:[eE][-+]?\d+)?";
-//
-//		// Instantiate the regular expression object.
-//		Regex r = new Regex(pattern, RegexOptions.IgnoreCase);
-//
-//		string entry = reader.ReadLine ();
-//		while (entry.Length > 0) {
-//			if (entry.StartsWith ("x")) {
-//				// Match the regular expression pattern against a text string.
-//				Match m = r.Match (entry);
-//				for (int i = 0; i < m.Groups.Count; i++) {
-//					CaptureCollection xy = m.Groups [i].Captures;
-//					// xy[0] = x; xy[1] = y
-//					xList.Add (float.Parse(xy [0].ToString));
-//					yList.Add (float.Parse(xy [1].ToString));
-//				}
-//			}
-//		}
 
 		string entry = reader.ReadLine ();
 		float x, y;
@@ -87,20 +70,13 @@ public class DataManager : MonoBehaviour {
 			entry = reader.ReadLine ();
 		}
 
-		for (int i = 0; i < xList.Count; i++) {
-			int intX = RoundToZero (xList [i]);
-			circuitX.Add (intX);
-			int intY = RoundToZero (yList [i]);
-			circuitY.Add (intY);
-		}
-
 
 		// 1st operation: Removal of overlapping points
 		List<int> removeIndex = new List<int>();
 
-		for (int i = 1, j = 0; i < circuitX.Count; i++) {
-			if (circuitX [i] == circuitX [j] &&
-				circuitY [i] == circuitY [j])
+		for (int i = 1, j = 0; i < xList.Count; i++) {
+			if (xList [i] == xList [j] &&
+				yList [i] == yList [j])
 				removeIndex.Add (i);
 			else {
 				j = i;
@@ -110,22 +86,22 @@ public class DataManager : MonoBehaviour {
 		removeIndex.Reverse ();
 		for (int i = 0, j = 0; i < removeIndex.Count; i++) {
 			j = removeIndex [i];
-			circuitX.RemoveAt (j);
-			circuitY.RemoveAt (j);
+			xList.RemoveAt (j);
+			yList.RemoveAt (j);
 		}
-
+		Debug.Log ("Finished operation 1");
 
 		// 2nd operation: removal of the too much high change in direction
 		removeIndex = new List<int> ();
 		int maxAngle = 90;
 
 		// first direction in between p0 and p1
-		float a0 = (Mathf.PI + Mathf.Atan2 (circuitY [1] - circuitY [0], circuitX [1] - circuitX [0])) * Mathf.Rad2Deg;
+		float a0 = (Mathf.Atan2 (yList [1] - yList [0], xList [1] - xList [0])) * Mathf.Rad2Deg;
 		float a;
 
-		for (int i = 2, j = 1; i < circuitX.Count; i++) {
+		for (int i = 2, j = 1; i < xList.Count; i++) {
 			// evaluate the angle respect to the previous point
-			a = (Mathf.PI + Mathf.Atan2 (circuitY [i] - circuitY [j], circuitX [i] - circuitX [j])) * Mathf.Rad2Deg;
+			a = (Mathf.Atan2 (yList [i] - yList [j], xList [i] - xList [j])) * Mathf.Rad2Deg;
 			// if the angle is too high, that point will be deleted
 			if (Mathf.Abs (a - a0) > maxAngle)
 				removeIndex.Add (i);
@@ -134,45 +110,72 @@ public class DataManager : MonoBehaviour {
 				j = i;
 			}
 		}
+		Debug.Log ("Finished operation 2");
 
 		removeIndex.Reverse ();
 		for (int i = 0, j = 0; i < removeIndex.Count; i++) {
 			j = removeIndex [i];
-			circuitX.RemoveAt (j);
-			circuitY.RemoveAt (j);
+			xList.RemoveAt (j);
+			yList.RemoveAt (j);
 		}
 
 
 		// 3rd operation: Removal of false changes in direction
 		removeIndex = new List<int>();
 
-		for (int i = 1; i < circuitX.Count - 1; i++) {
-			if (circuitX [i - 1] < circuitX [i + 1] && circuitX [i] < circuitX [i - 1] ||
-			    circuitX [i - 1] > circuitX [i + 1] && circuitX [i] > circuitX [i - 1] ||
-			    circuitY [i - 1] < circuitY [i + 1] && circuitY [i] < circuitY [i - 1] ||
-			    circuitY [i - 1] > circuitY [i + 1] && circuitY [i] > circuitY [i - 1])
+		for (int i = 1; i < xList.Count - 1; i++) {
+			if (xList [i - 1] < xList [i + 1] && xList [i] < xList [i - 1] ||
+				xList [i - 1] > xList [i + 1] && xList [i] > xList [i - 1] ||
+				yList [i - 1] < yList [i + 1] && yList [i] < yList [i - 1] ||
+				yList [i - 1] > yList [i + 1] && yList [i] > yList [i - 1])
 					removeIndex.Add (i);
 		}
 
 		removeIndex.Reverse ();
 		for (int i = 0, j = 0; i < removeIndex.Count; i++) {
 			j = removeIndex [i];
-			circuitX.RemoveAt (j);
-			circuitY.RemoveAt (j);
+			xList.RemoveAt (j);
+			yList.RemoveAt (j);
 		}
+		Debug.Log ("Finished operation 3");
 
 
-		//4th operation: evaluate the mean distance between the points
-		float mean_distance = Hypot(circuitX[1] - circuitX[0], circuitY[1] - circuitY[0]);
+		//4th operation: evaluate the mean distance between the points and scale them
+		float mean_distance = Hypot(xList[1] - xList[0], yList[1] - yList[0]);
 		float distance;
 
-		for (int i = 2; i < circuitX.Count; i++) {
-			distance = Hypot (circuitX [i] - circuitX [i - 1], circuitY [i] - circuitY [i - 1]);
+		for (int i = 2; i < xList.Count; i++) {
+			distance = Hypot (xList [i] - xList [i - 1], yList [i] - yList [i - 1]);
 			mean_distance = (distance + mean_distance * (i - 1)) / i;
 		}
-		// mean distance must be a scaling factor for the tiles
+		// mean distance must be a scaling factor for the points
 
+		circuitX.Add (xList [0]);
+		circuitY.Add (yList [0]);
+		float module, angle, deltaX, deltaY;
+		int scaleModule;
 
+		for (int i = 1, j = 0; i < xList.Count; i++) {
+			module = Hypot (xList[i] - xList[j], yList[i] - yList[j]);
+			angle = Mathf.Atan2 (yList[i] - yList[j], xList[i] - xList[j]) * Mathf.Rad2Deg;
+			scaleModule = RoundToZero (module / mean_distance);
+			if (scaleModule != 0) {
+				if (Mathf.Abs (angle) == 90.0f)
+					deltaX = 0.0f;
+				else
+					deltaX = scaleModule * Mathf.Cos (angle * Mathf.Deg2Rad);
+				if (angle == 0.0f || Mathf.Abs (angle) == 180.0f)
+					deltaY = 0.0f;
+				else
+					deltaY = scaleModule * Mathf.Sin (angle * Mathf.Deg2Rad);
+				circuitX.Add (xList [j] + deltaX);
+				circuitY.Add (yList [j] + deltaY);
+				j = i;
+			}
+		}
+		Debug.Log ("Finished operation 4");
+
+		Debug.Log ("Number of entries for the circuit: " + circuitX.Count);
 		// In the end, prints the results in the circuit file
 		for (int i = 0; i < circuitX.Count; i++) {
 			writer.WriteLine (i + " x:" + circuitX[i] + " y:" + circuitY[i]);
