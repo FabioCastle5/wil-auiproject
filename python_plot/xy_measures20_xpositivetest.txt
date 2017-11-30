@@ -1,0 +1,399 @@
+load 0x4010f000, len 1384, room 16
+tail 8
+chksum 0x2d
+csum 0---Entry 1
+accX = 0 | accY = 0
+velX = 0.00 | velY = 0.00
+x = 0.00 | y = 0.00
+---Entry 2
+accX = 0 | accY = 0
+velX = 0.00 | velY = 0.00
+x = 0.00 | y = 0.00
+---Entry 3
+accX = 0 | accY = 0
+velX = 0.00 | velY = 0.00
+x = 0.00 | y = 0.00
+---Entry 4
+accX = 0 | accY = 0
+velX = 0.00 | velY = 0.00
+x = 0.00 | y = 0.00
+---Entry 5
+accX = 0 | accY = 0
+velX = 0.00 | velY = 0.00
+x = 0.00 | y = 0.00
+---Entry 6
+accX = 0 | accY = 0
+velX = 0.00 | velY = 0.00
+x = 0.00 | y = 0.00
+---Entry 7
+accX = 0 | accY = 0
+velX = 0.00 | velY = 0.00
+x = 0.00 | y = 0.00
+---Entry 8
+accX = 0 | accY = 0
+velX = 0.00 | velY = 0.00
+x = 0.00 | y = 0.00
+---Entry 9
+accX = 0 | accY = 0
+velX = 0.00 | velY = 0.00
+x = 0.00 | y = 0.00
+---Entry 10
+accX = 333 | accY = 0
+velX = 12.70 | velY = 0.00
+x = 12.70 | y = 0.00
+---Entry 11
+accX = 271 | accY = 0
+velX = 12.24 | velY = 0.00
+x = 24.95 | y = 0.00
+---Entry 12
+accX = 361 | accY = -170
+velX = 15.61 | velY = -6.48
+x = 40.55 | y = -6.48
+---Entry 13
+accX = 0 | accY = 0
+velX = 2.34 | velY = -0.97
+x = 42.89 | y = -7.46
+---Entry 14
+accX = 195 | accY = -228
+velX = 7.79 | velY = -8.84
+x = 50.68 | y = -16.30
+---Entry 15
+accX = 91 | accY = -152
+velX = 4.64 | velY = -7.12
+x = 55.32 | y = -23.43
+---Entry 16
+accX = 213 | accY = 0
+velX = 8.82 | velY = -1.07
+x = 64.15 | y = -24.49
+---Entry 17
+accX = 0 | accY = 0
+velX = 1.32 | velY = -0.16
+x = 65.47 | y = -24.65
+---Entry 18
+accX = 221 | accY = 0
+velX = 8.63 | velY = -0.02
+x = 74.10 | y = -24.68
+---Entry 19
+accX = 305 | accY = 0
+velX = 12.93 | velY = -0.00
+x = 87.03 | y = -24.68
+---Entry 20
+accX = 0 | accY = 0
+velX = 1.94 | velY = -0.00
+x = 88.97 | y = -24.68
+---Entry 21
+accX = 409 | accY = 0
+velX = 15.89 | velY = -0.00
+x = 104.86 | y = -24.68
+---Entry 22
+accX = 211 | accY = 0
+velX = 10.43 | velY = -0.00
+x = 115.29 | y = -24.68
+---Entry 23
+accX = 75 | accY = 0
+velX = 4.43 | velY = -0.00
+x = 119.72 | y = -24.68
+---Entry 24
+accX = 0 | accY = 0
+velX = 0.66 | velY = -0.00
+x = 120.38 | y = -24.68
+---Entry 25
+accX = 221 | accY = 0
+velX = 8.53 | velY = -0.00
+x = 128.91 | y = -24.68
+---Entry 26
+accX = 147 | accY = 0
+velX = 6.89 | velY = -0.00
+x = 135.80 | y = -24.68
+---Entry 27
+accX = 257 | accY = 0
+velX = 10.84 | velY = -0.00
+x = 146.64 | y = -24.68
+---Entry 28
+accX = 319 | accY = 0
+velX = 13.79 | velY = -0.00
+x = 160.43 | y = -24.68
+---Entry 29
+accX = 0 | accY = 0
+velX = 2.07 | velY = -0.00
+x = 162.50 | y = -24.68
+---Entry 30
+accX = 173 | accY = 0
+velX = 6.91 | velY = -0.00
+x = 169.41 | y = -24.68
+---Entry 31
+accX = 251 | accY = 0
+velX = 10.61 | velY = -0.00
+x = 180.02 | y = -24.68
+---Entry 32
+accX = 135 | accY = 0
+velX = 6.74 | velY = -0.00
+x = 186.76 | y = -24.68
+---Entry 33
+accX = 237 | accY = 0
+velX = 10.05 | velY = -0.00
+x = 196.81 | y = -24.68
+---Entry 34
+accX = 329 | accY = 0
+velX = 14.06 | velY = -0.00
+x = 210.87 | y = -24.68
+---Entry 35
+accX = 187 | accY = 0
+velX = 9.24 | velY = -0.00
+x = 220.11 | y = -24.68
+---Entry 36
+accX = 267 | accY = 0
+velX = 11.57 | velY = -0.00
+x = 231.69 | y = -24.68
+---Entry 37
+accX = 93 | accY = 0
+velX = 5.28 | velY = -0.00
+x = 236.97 | y = -24.68
+---Entry 38
+accX = 191 | accY = -92
+velX = 8.08 | velY = -3.51
+x = 245.05 | y = -28.19
+---Entry 39
+accX = 0 | accY = 0
+velX = 1.21 | velY = -0.53
+x = 246.26 | y = -28.72
+---Entry 40
+accX = 0 | accY = 0
+velX = 0.18 | velY = -0.08
+x = 246.44 | y = -28.80
+---Entry 41
+accX = 0 | accY = 0
+velX = 0.03 | velY = -0.01
+x = 246.47 | y = -28.81
+---Entry 42
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 246.47 | y = -28.81
+---Entry 43
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 246.47 | y = -28.81
+---Entry 44
+accX = 263 | accY = 0
+velX = 10.03 | velY = -0.00
+x = 256.51 | y = -28.81
+---Entry 45
+accX = 199 | accY = 0
+velX = 9.10 | velY = -0.00
+x = 265.60 | y = -28.81
+---Entry 46
+accX = 271 | accY = 0
+velX = 11.70 | velY = -0.00
+x = 277.30 | y = -28.81
+---Entry 47
+accX = 167 | accY = 0
+velX = 8.13 | velY = -0.00
+x = 285.43 | y = -28.81
+---Entry 48
+accX = 0 | accY = 0
+velX = 1.22 | velY = -0.00
+x = 286.65 | y = -28.81
+---Entry 49
+accX = 269 | accY = 0
+velX = 10.44 | velY = -0.00
+x = 297.09 | y = -28.81
+---Entry 50
+accX = 115 | accY = 0
+velX = 5.95 | velY = -0.00
+x = 303.05 | y = -28.81
+---Entry 51
+accX = 443 | accY = 0
+velX = 17.79 | velY = -0.00
+x = 320.84 | y = -28.81
+---Entry 52
+accX = 0 | accY = 0
+velX = 2.67 | velY = -0.00
+x = 323.51 | y = -28.81
+---Entry 53
+accX = 107 | accY = 0
+velX = 4.48 | velY = -0.00
+x = 327.99 | y = -28.81
+---Entry 54
+accX = 0 | accY = 0
+velX = 0.67 | velY = -0.00
+x = 328.66 | y = -28.81
+---Entry 55
+accX = 0 | accY = -168
+velX = 0.10 | velY = -6.41
+x = 328.76 | y = -35.22
+---Entry 56
+accX = 161 | accY = -98
+velX = 6.16 | velY = -4.70
+x = 334.92 | y = -39.92
+---Entry 57
+accX = 0 | accY = 0
+velX = 0.92 | velY = -0.70
+x = 335.84 | y = -40.63
+---Entry 58
+accX = 259 | accY = 0
+velX = 10.02 | velY = -0.11
+x = 345.86 | y = -40.73
+---Entry 59
+accX = 185 | accY = 0
+velX = 8.56 | velY = -0.02
+x = 354.42 | y = -40.75
+---Entry 60
+accX = -60 | accY = 0
+velX = -1.00 | velY = -0.00
+x = 353.42 | y = -40.75
+---Entry 61
+accX = 247 | accY = 0
+velX = 9.27 | velY = -0.00
+x = 362.69 | y = -40.75
+---Entry 62
+accX = 193 | accY = 0
+velX = 8.75 | velY = -0.00
+x = 371.44 | y = -40.75
+---Entry 63
+accX = 0 | accY = 0
+velX = 1.31 | velY = -0.00
+x = 372.75 | y = -40.75
+---Entry 64
+accX = 0 | accY = 0
+velX = 0.20 | velY = -0.00
+x = 372.95 | y = -40.75
+---Entry 65
+accX = 0 | accY = 0
+velX = 0.03 | velY = -0.00
+x = 372.98 | y = -40.75
+---Entry 66
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 67
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 68
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 69
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 70
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 71
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 72
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 73
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 74
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 75
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 76
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 77
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 78
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 79
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 80
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 81
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 82
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 83
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 84
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 85
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 86
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 87
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 88
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 89
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 90
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 91
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 92
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 93
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 94
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 95
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 96
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 97
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 98
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75
+---Entry 99
+accX = 0 | accY = 0
+velX = 0.00 | velY = -0.00
+x = 372.99 | y = -40.75

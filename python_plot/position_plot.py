@@ -16,7 +16,7 @@ def round_zero(val):
         return val;
 
 # open file with data and plot them
-in_file = open("./xy_measures16.txt","r")
+in_file = open("./xy_measures22_ypositivetest.txt","r")
 x_list = []
 y_list = []
 circ_x = []
@@ -156,7 +156,7 @@ for x, y in zip(x_list, y_list):
 # evaluate the mean distance between the points
 # used to scale the circuit in a tile-like way
 mean_dist = math.hypot(x_list[1] - x_list[0], y_list[1] - y_list[0])
-for i in xrange(2, len(x_list) - 1):
+for i in xrange(2, len(x_list)):
     distance = math.hypot(x_list[i] - x_list[i-1], y_list[i] - y_list[i-1])
     mean_dist = (distance + mean_dist * (i - 1)) / i
 print("Mean distance: " + str(mean_dist))
@@ -166,11 +166,11 @@ min_distance = mean_dist
 j = 0
 circ_x.append(x_list[0])
 circ_y.append(y_list[0])
-for i in xrange(1, len(x_list) - 1):
+for i in xrange(1, len(x_list)):
     module = math.hypot(x_list[i] - x_list[j], y_list[i] - y_list[j])
     angle = math.degrees(math.atan2(y_list[i]-y_list[j], x_list[i]-x_list[j]))
     scale_module = round_zero(module / min_distance)
-    if not scale_module == 0:
+    if not (scale_module == 0):
         if math.fabs(angle) == 90:
             deltaX = 0
         else:
