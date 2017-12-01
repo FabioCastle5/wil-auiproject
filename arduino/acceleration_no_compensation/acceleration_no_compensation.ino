@@ -1,6 +1,6 @@
 /* This sketch is used to make some acceleration measures over the axes
- *  without any kind of compensations but the offset and the filter
- *  provided by the MPU6050
+ *  compensations used are the offset and the filter provided by the MPU6050
+ *  together with the error's mean compensation used in the final sketch
  */
 
 #include<Wire.h>
@@ -17,8 +17,8 @@
  *  
  *  Mean AccX Error: -21.47
  *  Mean AccY Error: -5.95
- *  Mean AccX Error: 8.75
- *  Mean AccY Error: 9.68
+ *  Dispersion AccX Error: 8.75
+ *  Dispersion AccY Error: 9.68
 */
 
 #define MPU6050_ACCEL_OFFSET_X 2767
@@ -30,9 +30,7 @@
 
 // evaluated with acceleration_mean_error.ino sketch and mean_dispersion.ino
 #define ACCX_MEAN_ERROR -21.47
-#define ACCX_DISPERSION: 8.75
 #define ACCY_MEAN_ERROR -5.95
-#define ACCY_DISPERSION: 9.6847
 
 #define MPU6050_DLPF_MODE 6
 
@@ -45,13 +43,27 @@ MPU6050 mpu;
 const int MPU_addr = 0x68; // I2C address of the MPU-6050
 
 // measures
-int16_t newaX, newaY;
+int16_t aX, aY;
 float delta_t;
 
 int n;
 // time trackers
 unsigned long startingTime;
 unsigned long endingTime;
+
+
+// Compensations for the error always got
+int correct_accX(int16_t ax) {
+  int corrAx;
+  corrAx = ax - ACCX_MEAN_ERROR;
+  return corrAx;
+}
+
+int correct_accY(int16_t ay) {
+  int corrAy;
+  corrAy = ay - ACCY_MEAN_ERROR;
+  return - corrAy;
+}
 
 
 void setup() {
@@ -78,8 +90,8 @@ void loop() {
   // takes tot samples of acceleration
   if (n < INIT_SAMPLES) {
     // reads and skips the first lectures
-    newaX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
-    newaY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+    aX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
+    aY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
     n = n + 1;
   }
   else if (n < SAMPLES + INIT_SAMPLES) {
@@ -90,11 +102,11 @@ void loop() {
     Wire.requestFrom(MPU_addr, 14, true); // request a total of 14 registers
 
     //gets acceleration data
-    newaX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
-    newaY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+    aX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
+    aY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
     Wire.endTransmission(true);
 
-    //prints results
+    //prints measures
     Serial.print("---Entry "); Serial.println(n - INIT_SAMPLES);
     Serial.print("accX = "); Serial.print(aX);
     Serial.print(" | accY = "); Serial.println(aY);
@@ -106,7 +118,7 @@ void loop() {
     // the dalay allow to have a constant sample rate
     if (endingTime - startingTime > DELTA_T) {
       Serial.println("Warning: the sample rate is too high");
-      n = SAMPLES;
+      n = SAMPLES + INIT_SAMPLES;
     }
     else
       delay(DELTA_T - (endingTime - startingTime));

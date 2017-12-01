@@ -1,7 +1,4 @@
-/*
- * This sketch can be used to evaluate the acceleration that cause
- * some kind of movement
- */
+// Main sketch for Wil toy
 
 #include<Wire.h>
 #include<I2Cdev.h>
@@ -34,8 +31,9 @@
 
 #define MPU6050_DLPF_MODE 6
 
+#define SAMPLES 100
 #define INIT_SAMPLES 20
-#define DELTA_T 500
+#define DELTA_T 125
 
 // TOLERANCE defines the threshold which separates a movement from a non-movement
 #define TOLERANCE_PX 50
@@ -49,17 +47,21 @@ MPU6050 mpu;
 const int MPU_addr = 0x68; // I2C address of the MPU-6050
 
 // measures
-int16_t aX, aY;
-bool finished;
+int16_t newaX, newaY;
+int aX, aY;
+int moveX, moveY;
+// measure counter
 int n;
 // time trackers
 unsigned long startingTime;
 unsigned long endingTime;
-
+// communication handlers
+bool active;
 
 void setup() {
+  //set the initial values for variables
   n = 0;
-  finished = false;
+  active = true;  // it should be enabled by the tablet instead
   
   Wire.begin();
   Wire.beginTransmission(MPU_addr);
@@ -78,9 +80,7 @@ void setup() {
   delay(1000);
 }
 
-//this function is the core of the sketch:
-// whenever the input given is not tolerable, the program stops and you can
-// read the value of acceleration that has not been tolered
+
 bool tolerable_x(int16_t input) {
   if (input < TOLERANCE_PX && input > TOLERANCE_NX)
     return true;
@@ -109,16 +109,22 @@ int correct_accY(int16_t ay) {
 
 
 void loop() {
-  // takes tot samples of acceleration
+  if (active) {
+    measureAndCommunicate();
+  }
+  else {
+    // understand if tablet is calling it
+    delay (60000);
+  }
+
+void measureAndCommunicate() {
   if (n < INIT_SAMPLES) {
     // reads and skips the first lectures
-    aX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
-    aY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+    newaX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
+    newaY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
     n = n + 1;
   }
-  else if (! finished) {
-    if (n = INIT_SAMPLES)
-      Serial.println("--- program ready ---");
+  else if (n < SAMPLES + INIT_SAMPLES) {
     startingTime = millis();  // starting time instant
     Wire.beginTransmission(MPU_addr);
     Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
@@ -126,34 +132,44 @@ void loop() {
     Wire.requestFrom(MPU_addr, 14, true); // request a total of 14 registers
 
     //gets acceleration data
-    aX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
-    aY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+    newaX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
+    newaY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
     Wire.endTransmission(true);
 
     //corrects raw data
-    aX = correct_accX(aX);
-    aY = correct_accY(aY);
-    
-    if (!tolerable_x(aX) || !tolerable_y(aY)) {
-      //prints result
-      Serial.print("Acceleration measured: ");
-      Serial.print("accX = "); Serial.print(aX);
-      Serial.print(" | accY = "); Serial.println(aY);
-      finished = true;
-    }
+    aX = correct_accX(newaX);
+    aY = correct_accY(newaY);
+
+    //a movement is perceived only if it caused an acceleration over the tolerance area
+    if (tolerable_x(aX))
+      moveX = 0;
+    else
+      moveX = 1;
+    if (tolerable_y(aY))
+      moveY = 0;
+    else
+      moveY = 1;
+
+    //prints results
+    Serial.print("---Entry "); Serial.println(n - INIT_SAMPLES + 1);
+    Serial.print("accX = "); Serial.print(aX);
+    Serial.print(" | accY = "); Serial.println(aY);
+    Serial.print("moveX = "); Serial.print(moveX);
+    Serial.print(" | moveY = "); Serial.println(moveY);
+
+    n = n + 1;
 
     endingTime = millis();
 
     // the dalay allow to have a constant sample rate
     if (endingTime - startingTime > DELTA_T) {
       Serial.println("Warning: the sample rate is too high");
-      finished = true;
+      n = SAMPLES;
     }
     else
       delay(DELTA_T - (endingTime - startingTime));
   }
   else {
-    // sleep for a minute
-    delay(60000);
+    active = false;
   }
 }
