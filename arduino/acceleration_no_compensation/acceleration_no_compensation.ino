@@ -8,12 +8,12 @@
 #include<MPU6050.h>
 
 /*  Offset evaluated <-> Choose optimistic or pessimistic ones
-/*  [2767,2768] --> [-12,8]
- *  [-1993,-1992] --> [-7,9]
- *  [1034,1034] --> [16377,16406]
- *  [98,99] --> [-1,1]
- *  [-15,-15] --> [0,1]
- *  [46,47] --> [-1,1]/
+/*  [2775,2776] --> [-15,7]
+ *  [-1979,-1978] --> [-9,5]
+ *  [999,1000] --> [16339,16396]
+ *  [95,96] --> [-1,1]
+ *  [-19,-19] --> [0,3]
+ *  [46,47] --> [-2,1]        
  *  
  *  Mean AccX Error: -21.47
  *  Mean AccY Error: -5.95
@@ -21,21 +21,17 @@
  *  Dispersion AccY Error: 9.68
 */
 
-#define MPU6050_ACCEL_OFFSET_X 2767
-#define MPU6050_ACCEL_OFFSET_Y -1993
-#define MPU6050_ACCEL_OFFSET_Z 1034
-#define MPU6050_GYRO_OFFSET_X  98
-#define MPU6050_GYRO_OFFSET_Y  -15
+#define MPU6050_ACCEL_OFFSET_X 2775
+#define MPU6050_ACCEL_OFFSET_Y -1979
+#define MPU6050_ACCEL_OFFSET_Z 999
+#define MPU6050_GYRO_OFFSET_X  95
+#define MPU6050_GYRO_OFFSET_Y  -19
 #define MPU6050_GYRO_OFFSET_Z  46
-
-// evaluated with acceleration_mean_error.ino sketch and mean_dispersion.ino
-#define ACCX_MEAN_ERROR -21.47
-#define ACCY_MEAN_ERROR -5.95
 
 #define MPU6050_DLPF_MODE 6
 
-#define SAMPLES 100
-#define INIT_SAMPLES 20
+#define SAMPLES 300
+#define INIT_SAMPLES 50
 #define DELTA_T 125
 
 // hw variables
@@ -50,20 +46,6 @@ int n;
 // time trackers
 unsigned long startingTime;
 unsigned long endingTime;
-
-
-// Compensations for the error always got
-int correct_accX(int16_t ax) {
-  int corrAx;
-  corrAx = ax - ACCX_MEAN_ERROR;
-  return corrAx;
-}
-
-int correct_accY(int16_t ay) {
-  int corrAy;
-  corrAy = ay - ACCY_MEAN_ERROR;
-  return - corrAy;
-}
 
 
 void setup() {

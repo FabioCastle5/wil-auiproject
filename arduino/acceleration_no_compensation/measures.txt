@@ -1,0 +1,603 @@
+load 0x4010f000, len 1384, room 16
+tail 8
+chksum 0x2d
+csum 0---Entry 0
+accX = -6 | accY = 6
+---Entry 1
+accX = -10 | accY = -10
+---Entry 2
+accX = -2 | accY = -14
+---Entry 3
+accX = -16 | accY = -14
+---Entry 4
+accX = -22 | accY = -2
+---Entry 5
+accX = -28 | accY = -14
+---Entry 6
+accX = 2 | accY = -2
+---Entry 7
+accX = -10 | accY = -6
+---Entry 8
+accX = -20 | accY = -22
+---Entry 9
+accX = -10 | accY = -18
+---Entry 10
+accX = -28 | accY = -10
+---Entry 11
+accX = -6 | accY = 4
+---Entry 12
+accX = -10 | accY = -8
+---Entry 13
+accX = -6 | accY = 2
+---Entry 14
+accX = -20 | accY = -18
+---Entry 15
+accX = -16 | accY = -26
+---Entry 16
+accX = -12 | accY = -18
+---Entry 17
+accX = -10 | accY = -6
+---Entry 18
+accX = -12 | accY = -16
+---Entry 19
+accX = -14 | accY = -4
+---Entry 20
+accX = -16 | accY = 6
+---Entry 21
+accX = -12 | accY = -16
+---Entry 22
+accX = -14 | accY = -22
+---Entry 23
+accX = -8 | accY = -4
+---Entry 24
+accX = -8 | accY = 0
+---Entry 25
+accX = -24 | accY = -4
+---Entry 26
+accX = -22 | accY = -8
+---Entry 27
+accX = -22 | accY = -10
+---Entry 28
+accX = -18 | accY = -10
+---Entry 29
+accX = -20 | accY = -16
+---Entry 30
+accX = 0 | accY = -24
+---Entry 31
+accX = -28 | accY = 0
+---Entry 32
+accX = -32 | accY = -6
+---Entry 33
+accX = -16 | accY = -4
+---Entry 34
+accX = -18 | accY = -12
+---Entry 35
+accX = -16 | accY = -14
+---Entry 36
+accX = -10 | accY = -20
+---Entry 37
+accX = -14 | accY = -16
+---Entry 38
+accX = -18 | accY = -4
+---Entry 39
+accX = -26 | accY = -6
+---Entry 40
+accX = -20 | accY = -6
+---Entry 41
+accX = 2 | accY = 4
+---Entry 42
+accX = -24 | accY = -4
+---Entry 43
+accX = -22 | accY = -4
+---Entry 44
+accX = -6 | accY = -6
+---Entry 45
+accX = -14 | accY = 6
+---Entry 46
+accX = -8 | accY = 2
+---Entry 47
+accX = -8 | accY = -8
+---Entry 48
+accX = -24 | accY = -14
+---Entry 49
+accX = -24 | accY = 4
+---Entry 50
+accX = -14 | accY = -12
+---Entry 51
+accX = -18 | accY = -22
+---Entry 52
+accX = -22 | accY = -6
+---Entry 53
+accX = -6 | accY = -16
+---Entry 54
+accX = -20 | accY = -6
+---Entry 55
+accX = -18 | accY = -2
+---Entry 56
+accX = -12 | accY = 0
+---Entry 57
+accX = -20 | accY = -4
+---Entry 58
+accX = -34 | accY = -6
+---Entry 59
+accX = -32 | accY = -20
+---Entry 60
+accX = -14 | accY = -16
+---Entry 61
+accX = -8 | accY = -22
+---Entry 62
+accX = -24 | accY = -22
+---Entry 63
+accX = -22 | accY = 0
+---Entry 64
+accX = -24 | accY = -4
+---Entry 65
+accX = -16 | accY = -10
+---Entry 66
+accX = -22 | accY = -24
+---Entry 67
+accX = -24 | accY = -2
+---Entry 68
+accX = -14 | accY = -8
+---Entry 69
+accX = -10 | accY = -8
+---Entry 70
+accX = -2 | accY = -16
+---Entry 71
+accX = -10 | accY = -20
+---Entry 72
+accX = -20 | accY = -6
+---Entry 73
+accX = -18 | accY = -8
+---Entry 74
+accX = -6 | accY = -22
+---Entry 75
+accX = -18 | accY = -8
+---Entry 76
+accX = -20 | accY = -2
+---Entry 77
+accX = -10 | accY = -8
+---Entry 78
+accX = 2 | accY = -12
+---Entry 79
+accX = -18 | accY = 2
+---Entry 80
+accX = -20 | accY = -12
+---Entry 81
+accX = -28 | accY = -8
+---Entry 82
+accX = -28 | accY = 6
+---Entry 83
+accX = -26 | accY = -28
+---Entry 84
+accX = -24 | accY = -14
+---Entry 85
+accX = -36 | accY = -12
+---Entry 86
+accX = -30 | accY = -16
+---Entry 87
+accX = -14 | accY = -6
+---Entry 88
+accX = -10 | accY = -6
+---Entry 89
+accX = -12 | accY = -8
+---Entry 90
+accX = -12 | accY = -12
+---Entry 91
+accX = -20 | accY = -10
+---Entry 92
+accX = -14 | accY = -20
+---Entry 93
+accX = -26 | accY = -4
+---Entry 94
+accX = -16 | accY = -14
+---Entry 95
+accX = -22 | accY = -14
+---Entry 96
+accX = -8 | accY = -6
+---Entry 97
+accX = -20 | accY = 0
+---Entry 98
+accX = -14 | accY = -6
+---Entry 99
+accX = -26 | accY = -22
+---Entry 100
+accX = -8 | accY = -22
+---Entry 101
+accX = -24 | accY = 0
+---Entry 102
+accX = -30 | accY = -14
+---Entry 103
+accX = -22 | accY = -14
+---Entry 104
+accX = -18 | accY = -8
+---Entry 105
+accX = -26 | accY = -20
+---Entry 106
+accX = -2 | accY = -16
+---Entry 107
+accX = -30 | accY = -2
+---Entry 108
+accX = -12 | accY = -8
+---Entry 109
+accX = -18 | accY = -6
+---Entry 110
+accX = -24 | accY = -8
+---Entry 111
+accX = -26 | accY = -20
+---Entry 112
+accX = -24 | accY = -20
+---Entry 113
+accX = -30 | accY = -6
+---Entry 114
+accX = -10 | accY = -8
+---Entry 115
+accX = -8 | accY = 8
+---Entry 116
+accX = -10 | accY = -14
+---Entry 117
+accX = -20 | accY = -20
+---Entry 118
+accX = -24 | accY = 2
+---Entry 119
+accX = -16 | accY = -12
+---Entry 120
+accX = -16 | accY = -8
+---Entry 121
+accX = -6 | accY = 4
+---Entry 122
+accX = -14 | accY = -8
+---Entry 123
+accX = -8 | accY = 6
+---Entry 124
+accX = -24 | accY = -10
+---Entry 125
+accX = -22 | accY = -12
+---Entry 126
+accX = -26 | accY = -18
+---Entry 127
+accX = -24 | accY = -18
+---Entry 128
+accX = -28 | accY = -10
+---Entry 129
+accX = -22 | accY = 6
+---Entry 130
+accX = -6 | accY = -20
+---Entry 131
+accX = -14 | accY = -12
+---Entry 132
+accX = -14 | accY = -16
+---Entry 133
+accX = -18 | accY = -10
+---Entry 134
+accX = -14 | accY = -16
+---Entry 135
+accX = -10 | accY = 0
+---Entry 136
+accX = -20 | accY = -4
+---Entry 137
+accX = -22 | accY = -18
+---Entry 138
+accX = -12 | accY = 0
+---Entry 139
+accX = -20 | accY = 4
+---Entry 140
+accX = -20 | accY = -18
+---Entry 141
+accX = -14 | accY = -26
+---Entry 142
+accX = -22 | accY = -10
+---Entry 143
+accX = -22 | accY = -14
+---Entry 144
+accX = -18 | accY = -20
+---Entry 145
+accX = -14 | accY = 4
+---Entry 146
+accX = -4 | accY = -12
+---Entry 147
+accX = -8 | accY = -4
+---Entry 148
+accX = -32 | accY = -6
+---Entry 149
+accX = -4 | accY = 0
+---Entry 150
+accX = 0 | accY = -12
+---Entry 151
+accX = -16 | accY = -16
+---Entry 152
+accX = -18 | accY = -10
+---Entry 153
+accX = -18 | accY = -10
+---Entry 154
+accX = -16 | accY = 0
+---Entry 155
+accX = -18 | accY = -6
+---Entry 156
+accX = -36 | accY = -6
+---Entry 157
+accX = -16 | accY = -16
+---Entry 158
+accX = -14 | accY = 6
+---Entry 159
+accX = -20 | accY = 0
+---Entry 160
+accX = -6 | accY = -24
+---Entry 161
+accX = -22 | accY = -4
+---Entry 162
+accX = -2 | accY = 12
+---Entry 163
+accX = -18 | accY = -16
+---Entry 164
+accX = -6 | accY = -10
+---Entry 165
+accX = -24 | accY = -18
+---Entry 166
+accX = -10 | accY = -4
+---Entry 167
+accX = -34 | accY = -4
+---Entry 168
+accX = -18 | accY = -14
+---Entry 169
+accX = 4 | accY = -10
+---Entry 170
+accX = -24 | accY = -16
+---Entry 171
+accX = -30 | accY = -12
+---Entry 172
+accX = -12 | accY = -26
+---Entry 173
+accX = -14 | accY = -12
+---Entry 174
+accX = -26 | accY = -2
+---Entry 175
+accX = -20 | accY = 6
+---Entry 176
+accX = -14 | accY = -8
+---Entry 177
+accX = -16 | accY = -8
+---Entry 178
+accX = -24 | accY = -10
+---Entry 179
+accX = -2 | accY = -18
+---Entry 180
+accX = -20 | accY = -10
+---Entry 181
+accX = -10 | accY = -16
+---Entry 182
+accX = -12 | accY = -12
+---Entry 183
+accX = -20 | accY = -8
+---Entry 184
+accX = -20 | accY = -8
+---Entry 185
+accX = -16 | accY = 2
+---Entry 186
+accX = -22 | accY = -20
+---Entry 187
+accX = 8 | accY = 6
+---Entry 188
+accX = -12 | accY = -24
+---Entry 189
+accX = -30 | accY = -12
+---Entry 190
+accX = -20 | accY = -12
+---Entry 191
+accX = -6 | accY = -2
+---Entry 192
+accX = -26 | accY = -18
+---Entry 193
+accX = -6 | accY = -6
+---Entry 194
+accX = -8 | accY = 2
+---Entry 195
+accX = -20 | accY = -4
+---Entry 196
+accX = -24 | accY = -2
+---Entry 197
+accX = -20 | accY = -14
+---Entry 198
+accX = -18 | accY = -10
+---Entry 199
+accX = -20 | accY = -6
+---Entry 200
+accX = -22 | accY = -16
+---Entry 201
+accX = -24 | accY = -20
+---Entry 202
+accX = -26 | accY = -6
+---Entry 203
+accX = -8 | accY = -10
+---Entry 204
+accX = -22 | accY = -20
+---Entry 205
+accX = -22 | accY = -10
+---Entry 206
+accX = -10 | accY = -10
+---Entry 207
+accX = -16 | accY = -20
+---Entry 208
+accX = -22 | accY = -14
+---Entry 209
+accX = -20 | accY = -4
+---Entry 210
+accX = -6 | accY = -14
+---Entry 211
+accX = -30 | accY = -6
+---Entry 212
+accX = -26 | accY = -12
+---Entry 213
+accX = -18 | accY = 2
+---Entry 214
+accX = -10 | accY = -10
+---Entry 215
+accX = -12 | accY = -6
+---Entry 216
+accX = -26 | accY = -6
+---Entry 217
+accX = -2 | accY = -22
+---Entry 218
+accX = -24 | accY = -14
+---Entry 219
+accX = -26 | accY = -10
+---Entry 220
+accX = -36 | accY = -12
+---Entry 221
+accX = -12 | accY = -4
+---Entry 222
+accX = -14 | accY = -6
+---Entry 223
+accX = -20 | accY = -10
+---Entry 224
+accX = -22 | accY = -8
+---Entry 225
+accX = -8 | accY = 2
+---Entry 226
+accX = -10 | accY = -14
+---Entry 227
+accX = -30 | accY = 6
+---Entry 228
+accX = -20 | accY = -12
+---Entry 229
+accX = -20 | accY = -6
+---Entry 230
+accX = -16 | accY = -12
+---Entry 231
+accX = -28 | accY = -4
+---Entry 232
+accX = -22 | accY = -2
+---Entry 233
+accX = -26 | accY = -8
+---Entry 234
+accX = -14 | accY = -16
+---Entry 235
+accX = 16 | accY = -16
+---Entry 236
+accX = -12 | accY = -22
+---Entry 237
+accX = -22 | accY = 0
+---Entry 238
+accX = -24 | accY = 0
+---Entry 239
+accX = -28 | accY = 0
+---Entry 240
+accX = -12 | accY = -12
+---Entry 241
+accX = -26 | accY = -8
+---Entry 242
+accX = -4 | accY = -16
+---Entry 243
+accX = -22 | accY = -20
+---Entry 244
+accX = -20 | accY = -6
+---Entry 245
+accX = -24 | accY = 0
+---Entry 246
+accX = -26 | accY = -12
+---Entry 247
+accX = -32 | accY = -18
+---Entry 248
+accX = -8 | accY = -8
+---Entry 249
+accX = -12 | accY = -22
+---Entry 250
+accX = -14 | accY = -18
+---Entry 251
+accX = -20 | accY = -16
+---Entry 252
+accX = -16 | accY = -18
+---Entry 253
+accX = -28 | accY = -8
+---Entry 254
+accX = -18 | accY = -10
+---Entry 255
+accX = -20 | accY = -4
+---Entry 256
+accX = -26 | accY = -2
+---Entry 257
+accX = -30 | accY = -14
+---Entry 258
+accX = -16 | accY = -8
+---Entry 259
+accX = -12 | accY = -14
+---Entry 260
+accX = -16 | accY = -6
+---Entry 261
+accX = -10 | accY = -24
+---Entry 262
+accX = -10 | accY = -8
+---Entry 263
+accX = 2 | accY = -16
+---Entry 264
+accX = -16 | accY = -8
+---Entry 265
+accX = -16 | accY = 2
+---Entry 266
+accX = -12 | accY = 0
+---Entry 267
+accX = -12 | accY = -24
+---Entry 268
+accX = 2 | accY = -10
+---Entry 269
+accX = -18 | accY = 0
+---Entry 270
+accX = -30 | accY = -2
+---Entry 271
+accX = -12 | accY = -12
+---Entry 272
+accX = -28 | accY = -8
+---Entry 273
+accX = -20 | accY = 2
+---Entry 274
+accX = -28 | accY = -2
+---Entry 275
+accX = -22 | accY = -8
+---Entry 276
+accX = -22 | accY = -26
+---Entry 277
+accX = -22 | accY = -16
+---Entry 278
+accX = -20 | accY = -26
+---Entry 279
+accX = -20 | accY = 2
+---Entry 280
+accX = -32 | accY = -16
+---Entry 281
+accX = -16 | accY = 2
+---Entry 282
+accX = -30 | accY = -14
+---Entry 283
+accX = -26 | accY = -6
+---Entry 284
+accX = -24 | accY = -24
+---Entry 285
+accX = -30 | accY = -12
+---Entry 286
+accX = -22 | accY = -16
+---Entry 287
+accX = -12 | accY = -16
+---Entry 288
+accX = -20 | accY = -14
+---Entry 289
+accX = -16 | accY = 0
+---Entry 290
+accX = -28 | accY = -2
+---Entry 291
+accX = -12 | accY = 4
+---Entry 292
+accX = -6 | accY = -14
+---Entry 293
+accX = -26 | accY = -4
+---Entry 294
+accX = -30 | accY = -14
+---Entry 295
+accX = -22 | accY = -14
+---Entry 296
+accX = -20 | accY = -8
+---Entry 297
+accX = -26 | accY = 2
+---Entry 298
+accX = -20 | accY = -8
+---Entry 299
+accX = -26 | accY = -6

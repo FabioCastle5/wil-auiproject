@@ -7,12 +7,17 @@ using System;
 public class DataManager : MonoBehaviour {
 
 	public TextAsset measures;
-	public TextAsset circuitPoints;
 
 
 	void Awake() {
 		Debug.Log ("Starting awake");
-		ElaborateRawData ();
+
+		string newFile = "circuit-" + System.DateTime.Now.ToString("dd-MM-yyyy") + System.DateTime.Now.ToString("hh-mm-ss") + ".txt";
+		string newPath = Application.dataPath + "/Files/" + newFile;
+		File.WriteAllText(newPath, String.Empty);
+		AssetDatabase.Refresh();
+
+		ElaborateRawData (newPath);
 	}
 
 
@@ -36,20 +41,19 @@ public class DataManager : MonoBehaviour {
 	}
 
 
-	public void ElaborateRawData() {
+	public void ElaborateRawData(string newPath) {
 
 		Debug.Log ("Starting ElaborateRawData");
 
 		List<float> xList = new List<float> ();
 		List<float> yList = new List<float> ();
-		List<float> circuitX = new List<float> ();
-		List<float> circuitY = new List<float> ();
+		List<int> circuitX = new List<int> ();
+		List<int> circuitY = new List<int> ();
 
 		string inputPath = AssetDatabase.GetAssetPath (measures);
-		string outputPath = AssetDatabase.GetAssetPath (circuitPoints);
+		string outputPath = newPath;
 
 		FileStream inputStream = File.Open (inputPath, FileMode.Open, FileAccess.Read);
-		File.WriteAllText(outputPath, String.Empty);
 		FileStream outputStream = File.Open (outputPath, FileMode.Open, FileAccess.Write);
 		StreamReader reader = new StreamReader (inputStream);
 		StreamWriter writer = new StreamWriter (outputStream);
@@ -150,8 +154,8 @@ public class DataManager : MonoBehaviour {
 		}
 		// mean distance must be a scaling factor for the points
 
-		circuitX.Add (xList [0]);
-		circuitY.Add (yList [0]);
+		circuitX.Add (RoundToZero(xList [0]));
+		circuitY.Add (RoundToZero(yList [0]));
 		float module, angle, deltaX, deltaY;
 		int scaleModule;
 
@@ -168,8 +172,8 @@ public class DataManager : MonoBehaviour {
 					deltaY = 0.0f;
 				else
 					deltaY = scaleModule * Mathf.Sin (angle * Mathf.Deg2Rad);
-				circuitX.Add (xList [j] + deltaX);
-				circuitY.Add (yList [j] + deltaY);
+				circuitX.Add (RoundToZero(xList [j] + deltaX));
+				circuitY.Add (RoundToZero(yList [j] + deltaY));
 				j = i;
 			}
 		}
@@ -178,9 +182,71 @@ public class DataManager : MonoBehaviour {
 		Debug.Log ("Number of entries for the circuit: " + circuitX.Count);
 		// In the end, prints the results in the circuit file
 		for (int i = 0; i < circuitX.Count; i++) {
-			writer.WriteLine (i + " x:" + circuitX[i] + " y:" + circuitY[i]);
+			writer.WriteLine ("x = " + circuitX[i] + "|" + " y= " + circuitY[i]);
 		}
 		writer.Flush();
+		AssetDatabase.SaveAssets ();
 		AssetDatabase.Refresh ();
+
+		writer.Close ();
+		reader.Close ();
+		outputStream.Close ();
+		inputStream.Close ();
+	}
+
+	public void BuildCircuit (string circuitPath) {
+
+		Debug.Log ("Started building circuit");
+
+		FileStream inputStream = File.Open (circuitPath, FileMode.Open, FileAccess.Read);
+		StreamReader reader = new StreamReader (inputStream);
+		List<int> circuitX = new List<int> ();
+		List<int> circuitY = new List<int> ();
+
+		string entry = reader.ReadLine ();
+		int x, y;
+		while (entry != null) {
+			if (entry.StartsWith ("x")) {
+				entry.Replace (" ", "");
+				string[] split = entry.Split ('|');
+				string[] splitx = split [0].Split ('=');
+				string[] splity = split [1].Split ('=');
+				x = int.Parse (splitx [1]);
+				y = int.Parse (splity [1]);
+				circuitX.Add (x);
+				circuitY.Add (y);
+			}
+			entry = reader.ReadLine ();
+		}
+
+		int angle;
+
+		//evaluate the angle between the starting point and the next one
+		angle = RoundToZero((Mathf.Atan2 (circuitY [1] - circuitY [0], circuitX [1] - circuitX [0])) * Mathf.Rad2Deg);
+		// draw the starting tile
+		drawStart (angle);
+
+		for (int i = 1; i < circuitX.Count - 1; i++) {
+			// evaluate the angle respect to the previous point
+			angle = RoundToZero((Mathf.Atan2 (circuitY [i] - circuitY [i + 1], circuitX [i] - circuitX [i + 1])) * Mathf.Rad2Deg);
+			// draw another tile
+			drawStep (angle);
+		}
+
+		// note: angle contains the angle between the last point and the previous one
+		// draw the finish tile
+		drawFinish(angle);
+
+		reader.Close ();
+		inputStream.Close ();
+	}
+
+	void drawStart(int angle) {
+	}
+
+	void drawStep(int angle) {
+	}
+
+	void drawFinish(int angle) {
 	}
 }

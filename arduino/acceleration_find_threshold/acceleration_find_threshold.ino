@@ -8,12 +8,12 @@
 #include<MPU6050.h>
 
 /*  Offset evaluated <-> Choose optimistic or pessimistic ones
-/*  [2767,2768] --> [-12,8]
- *  [-1993,-1992] --> [-7,9]
- *  [1034,1034] --> [16377,16406]
- *  [98,99] --> [-1,1]
- *  [-15,-15] --> [0,1]
- *  [46,47] --> [-1,1]/
+/*  [2775,2776] --> [-15,7]
+ *  [-1979,-1978] --> [-9,5]
+ *  [999,1000] --> [16339,16396]
+ *  [95,96] --> [-1,1]
+ *  [-19,-19] --> [0,3]
+ *  [46,47] --> [-2,1] 
  *  
  *  Mean AccX Error: -21.47
  *  Mean AccY Error: -5.95
@@ -21,27 +21,24 @@
  *  Dispersion AccY Error: 9.68
 */
 
-#define MPU6050_ACCEL_OFFSET_X 2767
-#define MPU6050_ACCEL_OFFSET_Y -1993
-#define MPU6050_ACCEL_OFFSET_Z 1034
-#define MPU6050_GYRO_OFFSET_X  98
-#define MPU6050_GYRO_OFFSET_Y  -15
+#define MPU6050_ACCEL_OFFSET_X 2775
+#define MPU6050_ACCEL_OFFSET_Y -1979
+#define MPU6050_ACCEL_OFFSET_Z 999
+#define MPU6050_GYRO_OFFSET_X  95
+#define MPU6050_GYRO_OFFSET_Y  -19
 #define MPU6050_GYRO_OFFSET_Z  46
-
-// evaluated with acceleration_mean_error.ino sketch and mean_dispersion.ino
-#define ACCX_MEAN_ERROR -21.47
-#define ACCY_MEAN_ERROR -5.95
 
 #define MPU6050_DLPF_MODE 6
 
 #define INIT_SAMPLES 20
-#define DELTA_T 500
+#define SAMPLES 20
+#define DELTA_T 200
 
 // TOLERANCE defines the threshold which separates a movement from a non-movement
-#define TOLERANCE_PX 50
-#define TOLERANCE_NX -50
-#define TOLERANCE_PY 50
-#define TOLERANCE_NY -50
+#define TOLERANCE_PX 200
+#define TOLERANCE_NX -240
+#define TOLERANCE_PY 240
+#define TOLERANCE_NY -280
 
 
 // hw variables
@@ -50,7 +47,7 @@ const int MPU_addr = 0x68; // I2C address of the MPU-6050
 
 // measures
 int16_t aX, aY;
-bool finished;
+int moveX, moveY;
 int n;
 // time trackers
 unsigned long startingTime;
@@ -59,7 +56,6 @@ unsigned long endingTime;
 
 void setup() {
   n = 0;
-  finished = false;
   
   Wire.begin();
   Wire.beginTransmission(MPU_addr);
@@ -95,18 +91,6 @@ bool tolerable_y(int16_t input) {
     return false;
 }
 
-int correct_accX(int16_t ax) {
-  int corrAx;
-  corrAx = ax - ACCX_MEAN_ERROR;
-  return corrAx;
-}
-
-int correct_accY(int16_t ay) {
-  int corrAy;
-  corrAy = ay - ACCY_MEAN_ERROR;
-  return - corrAy;
-}
-
 
 void loop() {
   // takes tot samples of acceleration
@@ -116,9 +100,10 @@ void loop() {
     aY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
     n = n + 1;
   }
-  else if (! finished) {
-    if (n = INIT_SAMPLES)
+  else if (n < INIT_SAMPLES + SAMPLES) {
+    if (n == INIT_SAMPLES){
       Serial.println("--- program ready ---");
+    }
     startingTime = millis();  // starting time instant
     Wire.beginTransmission(MPU_addr);
     Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
@@ -129,31 +114,69 @@ void loop() {
     aX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
     aY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
     Wire.endTransmission(true);
+    // measure on y in inverted
+    aY = -aY;
 
-    //corrects raw data
-    aX = correct_accX(aX);
-    aY = correct_accY(aY);
-    
-    if (!tolerable_x(aX) || !tolerable_y(aY)) {
-      //prints result
-      Serial.print("Acceleration measured: ");
-      Serial.print("accX = "); Serial.print(aX);
-      Serial.print(" | accY = "); Serial.println(aY);
-      finished = true;
+    //if (!tolerable_x(aX)) {
+    //  //prints measure
+    //  Serial.print("Acceleration measured: ");
+    //  Serial.print("accX = "); Serial.println(aX);
+    //}
+
+    //if (!tolerable_y(aY)) {
+    //  //prints measure
+    //  Serial.print("Acceleration measured: ");
+    //  Serial.print("accY = "); Serial.println(aY);
+    //  finished = true;
+    //}
+
+    //a movement is perceived only if it caused an acceleration over the tolerance area
+    if (tolerable_x(aX))
+      moveX = 0;
+    else {
+      if (aX < 0)
+        moveX = -1;
+      else
+        moveX = 1;
     }
+    if (tolerable_y(aY))
+      moveY = 0;
+    else {
+      if (aY < 0)
+        moveY = 0;
+      else
+        moveY = 1;
+    }
+
+    //prints results
+    Serial.print("---Entry "); Serial.println(n - INIT_SAMPLES + 1);
+    Serial.print("accX = "); Serial.print(aX);
+    Serial.print(" | accY = "); Serial.println(aY);
+    Serial.print("moveX = "); Serial.print(moveX);
+    Serial.print(" | moveY = "); Serial.println(moveY);
+
+    n = n + 1;
+    
 
     endingTime = millis();
 
     // the dalay allow to have a constant sample rate
     if (endingTime - startingTime > DELTA_T) {
       Serial.println("Warning: the sample rate is too high");
-      finished = true;
     }
     else
       delay(DELTA_T - (endingTime - startingTime));
   }
   else {
-    // sleep for a minute
-    delay(60000);
+    // sleep for 10 seconds
+    delay(5000);
+    // I read some character -> restart
+    if (Serial.available() > 0) {
+      n = 0;
+      while (Serial.available() > 0)
+        Serial.read();
+      Serial.println("--- restarting ---");
+    }
+    delay(5000);
   }
 }

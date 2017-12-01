@@ -1,0 +1,62 @@
+--- restarting ---
+--- program ready ---
+---Entry 1
+accX = 44 | accY = 36
+moveX = 0 | moveY = 0
+---Entry 2
+accX = 36 | accY = 18
+moveX = 0 | moveY = 0
+---Entry 3
+accX = 44 | accY = 32
+moveX = 0 | moveY = 0
+---Entry 4
+accX = 38 | accY = 24
+moveX = 0 | moveY = 0
+---Entry 5
+accX = 138 | accY = -1302
+moveX = 0 | moveY = 0
+---Entry 6
+accX = 72 | accY = -402
+moveX = 0 | moveY = 0
+---Entry 7
+accX = 98 | accY = -138
+moveX = 0 | moveY = 0
+---Entry 8
+accX = 114 | accY = 576
+moveX = 0 | moveY = 1
+---Entry 9
+accX = -24 | accY = 490
+moveX = 0 | moveY = 1
+---Entry 10
+accX = 940 | accY = 78
+moveX = 1 | moveY = 0
+---Entry 11
+accX = 836 | accY = 106
+moveX = 1 | moveY = 0
+---Entry 12
+accX = -272 | accY = -84
+moveX = -1 | moveY = 0
+---Entry 13
+accX = 296 | accY = 50
+moveX = 1 | moveY = 0
+---Entry 14
+accX = 302 | accY = 232
+moveX = 1 | moveY = 0
+---Entry 15
+accX = 488 | accY = -210
+moveX = 1 | moveY = 0
+---Entry 16
+accX = -174 | accY = 206
+moveX = 0 | moveY = 0
+---Entry 17
+accX = -1002 | accY = 12
+moveX = -1 | moveY = 0
+---Entry 18
+accX = -372 | accY = -20
+moveX = -1 | moveY = 0
+---Entry 19
+accX = 236 | accY = 1162
+moveX = 1 | moveY = 1
+---Entry 20
+accX = -190 | accY = 690
+moveX = 0 | moveY = 1
