@@ -31,7 +31,7 @@
 #define MPU6050_DLPF_MODE 6
 
 #define INIT_SAMPLES 20
-#define SAMPLES 20
+#define SAMPLES 30
 #define DELTA_T 200
 
 // TOLERANCE defines the threshold which separates a movement from a non-movement
@@ -113,7 +113,6 @@ void loop() {
     //gets acceleration data
     aX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
     aY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
-    Wire.endTransmission(true);
     // measure on y in inverted
     aY = -aY;
 

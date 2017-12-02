@@ -3,6 +3,7 @@ import matplotlib.gridspec as gridspec
 import numpy as np
 from scipy.interpolate import interp1d
 import re
+from collections import OrderedDict
 
 # open file with data and plot them
 in_file = open("./measures.txt","r")
@@ -27,6 +28,28 @@ while len(entry) > 1:
         moveY.append(int(b))
     entry = in_file.readline()
 in_file.close()
+
+i = 0
+while i < len(moveX) - 1:
+    if (moveY[i] == 0) and not (moveX[i] == 0):
+        j = i + 1
+        while (j < len(moveY)) and not (moveY[j] == 1):
+            if moveX[j] == -moveX[i]:
+                moveX[j] = 0
+            j = j + 1
+        i = j
+    else:
+        i = i + 1
+
+r_indexes = []
+for i in range(len(moveX)):
+    if moveX[i] == 0 and moveY[i] == 0:
+        r_indexes.append(i)
+
+for i in reversed(r_indexes):
+    moveX.pop(i)
+    moveY.pop(i)
+
 
 x.append(0)
 y.append(0)
@@ -60,16 +83,16 @@ ax5 = plt.subplot2grid((4,2), (0, 1), rowspan=4)
 ax5.plot(x, y, 'go', x, y, 'g-')
 ax5.set_title("Movement 2D")
 k = 0
-seen = []
+#seen = []
 for a, b in zip(x, y):
-    if [a, b] not in seen:
-        k = k + 1
-        seen.append([a, b])
-        ax5.annotate(
-            'point{0}'.format(k),
-            xy=(a, b), xytext=(-5, 5),
-            textcoords='offset points', ha='right', va='bottom',
-            bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
-        )
+#    if [a, b] not in seen:
+    k = k + 1
+#        seen.append([a, b])
+    ax5.annotate(
+        'point{0}'.format(k),
+        xy=(a, b), xytext=(-5, 5),
+        textcoords='offset points', ha='right', va='bottom',
+        bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
+    )
 
 plt.show()
