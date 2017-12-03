@@ -71,12 +71,13 @@ void setup() {
   mpu.setDLPFMode((uint8_t) MPU6050_DLPF_MODE);
   Wire.endTransmission(true);
   // setup serial communication and wifi
-  Serial.begin(115200);
+  Serial.begin(9600);
   WiFi.mode(WIFI_AP); //ESP8266-12E is an AccessPoint
   WiFi.softAP(ID, PASS);  // Provide the (SSID, password); .
   server.begin(); // Start the HTTP Server
   // read some initial values and discard them
   read_some_values();
+  Serial.println("--- Server ready ---");
 }
 
 
@@ -94,6 +95,7 @@ void loop() {
       delay(DELTA_T - (endingTime - startingTime));
     }
   }
+  delay(5000);
 }
 
 

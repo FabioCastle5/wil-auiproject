@@ -3,200 +3,170 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
 using System;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
+using System.Diagnostics;
 
 public class DataManager : MonoBehaviour {
 
 	public TextAsset measures;
 
+	private List<string> entries;
+
+	private volatile bool finished;
+	private const int readingTime = 30;
+
 
 	void Awake() {
-		Debug.Log ("Starting awake");
+		UnityEngine.Debug.Log ("Starting awake");
+		entries = new List<string>();
+		finished = false;
 
+		// connect to toy and fill entries with the strings received by it
+		ConnectAndReadData ();
+		
+		// create a new file to save the new cicuit
 		string newFile = "circuit-" + System.DateTime.Now.ToString("dd-MM-yyyy") + System.DateTime.Now.ToString("hh-mm-ss") + ".txt";
 		string newPath = Application.dataPath + "/Files/" + newFile;
 		File.WriteAllText(newPath, String.Empty);
 		AssetDatabase.Refresh();
 
+		// elaborate entries and save data onto the new circuit file
 		ElaborateRawData (newPath);
+		// build the circuit starting from the circuit file created
+		BuildCircuit (newPath);
 	}
 
 
-	private int RoundToZero(float value) {
-		int i;
+	private void ConnectAndReadData() {
+		UnityEngine.Debug.Log ("Starting ConnectAndReadData");
 
-		if (value > 0)
-			i = (int) Mathf.Floor (value);
-		else if (value < 0)
-			i = (int) Mathf.Ceil (value);
-		else
-			i = 0;
+		TcpClient client = new TcpClient();
 
-		return i;
-	
-	}
+		Thread timeThread = new Thread (() => {
+			Thread.Sleep (readingTime * 1000);
+			finished = true;
+		});
 
-
-	private float Hypot(float a, float b) {
-		return (float) Mathf.Sqrt(Mathf.Pow(a, 2) + Mathf.Pow(b, 2));
+		client.Connect("ESP8266-WIL", 80);
+		StreamReader stream = new StreamReader(client.GetStream());
+		timeThread.Start ();
+		// buffer hosts the read string until it isn't finished
+		var buffer = new List<byte>();
+		// (-1|0|1);(0|1)\r - format of the received string
+		while (client.Connected && !finished)
+		{
+			// Read the next byte
+			var read = stream.Read();
+			// a reading is split with the others by the carriage return, symbol = 13
+			if (read == 13)
+			{
+				// reading is finished, convert our buffer to a string and add it to entries
+				string str = Encoding.ASCII.GetString(buffer.ToArray());
+				entries.Add (str);
+				// Clear the buffer ready for another reading
+				buffer.Clear();
+			}
+			else
+				// If this wasn't the end of a reading, then just add this new byte to our buffer
+				buffer.Add((byte)read);
+		}
 	}
 
 
 	public void ElaborateRawData(string newPath) {
 
-		Debug.Log ("Starting ElaborateRawData");
+		UnityEngine.Debug.Log ("Starting ElaborateRawData");
 
-		List<float> xList = new List<float> ();
-		List<float> yList = new List<float> ();
-		List<int> circuitX = new List<int> ();
-		List<int> circuitY = new List<int> ();
+		List<int> moveX = new List<int> ();
+		List<int> moveY = new List<int> ();
+		List<int> posX = new List<int> ();
+		List<int> posY = new List<int> ();
 
-		string inputPath = AssetDatabase.GetAssetPath (measures);
+		int i = 0;
+		int j = 0;
+
 		string outputPath = newPath;
 
-		FileStream inputStream = File.Open (inputPath, FileMode.Open, FileAccess.Read);
 		FileStream outputStream = File.Open (outputPath, FileMode.Open, FileAccess.Write);
-		StreamReader reader = new StreamReader (inputStream);
 		StreamWriter writer = new StreamWriter (outputStream);
 
-		string entry = reader.ReadLine ();
-		float x, y;
-		while (entry != null) {
-			if (entry.StartsWith ("x")) {
-				entry.Replace (" ", "");
-				string[] split = entry.Split ('|');
-				string[] splitx = split [0].Split ('=');
-				string[] splity = split [1].Split ('=');
-				x = float.Parse (splitx [1]);
-				y = float.Parse (splity [1]);
-				xList.Add (x);
-				yList.Add (y);
+		string entry;
+		// (-1|0|1);(0|1) - format of the single entry in entries
+		for (i = 0; i < entries.Count; i++) {
+			entry = entries [i];
+			if (entry != null) {
+				string[] split = entry.Split (';');
+				// split[0] contains (-1|0|1); split[1] contains (0|1)
+				moveX.Add (int.Parse (split [0]));
+				moveY.Add (int.Parse (split [1]));
 			}
-			entry = reader.ReadLine ();
 		}
 
+		// 1st operation: removes the unsupported change in direction, that are the ones
+		// that makes the player going back on its current path(180° curves)
+		i = 0;
+		j = 0;
 
-		// 1st operation: Removal of overlapping points
+		while (i < moveX.Count - 1) {
+			if (moveY [i] == 0 && moveX [i] != 0) {
+				for (j = i + 1; j < moveX.Count && moveY [j] != 1; j++)
+					if (moveX [j] == -moveX [i])
+						moveX [j] = 0;
+				i = j;
+			} else
+				i += 1;
+		}
+
+		// 2nd operation: removes the (0,0) moves, which are not useful to evaluate the circuit
 		List<int> removeIndex = new List<int>();
-
-		for (int i = 1, j = 0; i < xList.Count; i++) {
-			if (xList [i] == xList [j] &&
-				yList [i] == yList [j])
+		for (i = 0; i < moveX.Count; i++) {
+			if (moveX [i] == 0 && moveY [i] == 0)
 				removeIndex.Add (i);
-			else {
-				j = i;
-			}
 		}
 
 		removeIndex.Reverse ();
-		for (int i = 0, j = 0; i < removeIndex.Count; i++) {
-			j = removeIndex [i];
-			xList.RemoveAt (j);
-			yList.RemoveAt (j);
-		}
-		Debug.Log ("Finished operation 1");
-
-		// 2nd operation: removal of the too much high change in direction
-		removeIndex = new List<int> ();
-		int maxAngle = 90;
-
-		// first direction in between p0 and p1
-		float a0 = (Mathf.Atan2 (yList [1] - yList [0], xList [1] - xList [0])) * Mathf.Rad2Deg;
-		float a;
-
-		for (int i = 2, j = 1; i < xList.Count; i++) {
-			// evaluate the angle respect to the previous point
-			a = (Mathf.Atan2 (yList [i] - yList [j], xList [i] - xList [j])) * Mathf.Rad2Deg;
-			// if the angle is too high, that point will be deleted
-			if (Mathf.Abs (a - a0) > maxAngle)
-				removeIndex.Add (i);
-			else {
-				a0 = a;
-				j = i;
-			}
-		}
-		Debug.Log ("Finished operation 2");
-
-		removeIndex.Reverse ();
-		for (int i = 0, j = 0; i < removeIndex.Count; i++) {
-			j = removeIndex [i];
-			xList.RemoveAt (j);
-			yList.RemoveAt (j);
+		for (i = 0; i < removeIndex.Count; i++) {
+			moveX.RemoveAt (removeIndex [i]);
+			moveY.RemoveAt (removeIndex [i]);
 		}
 
+		// evaluation of the circuit: evaluate the position of the toy over each step
+		// the circuit always starts in the position (0,0)
+		posX.Add (0);
+		posY.Add (0);
+		int lastx = 0;
+		int lasty = 0;
+		int px = 0;
+		int py = 0;
 
-		// 3rd operation: Removal of false changes in direction
-		removeIndex = new List<int>();
-
-		for (int i = 1; i < xList.Count - 1; i++) {
-			if (xList [i - 1] < xList [i + 1] && xList [i] < xList [i - 1] ||
-				xList [i - 1] > xList [i + 1] && xList [i] > xList [i - 1] ||
-				yList [i - 1] < yList [i + 1] && yList [i] < yList [i - 1] ||
-				yList [i - 1] > yList [i + 1] && yList [i] > yList [i - 1])
-					removeIndex.Add (i);
+		for (i = 0; i < moveX.Count; i++) {
+			px = lastx + moveX [i];
+			py = lasty + moveY [i];
+			posX.Add (px);
+			posY.Add (py);
+			lastx = px;
+			lasty = py;
 		}
 
-		removeIndex.Reverse ();
-		for (int i = 0, j = 0; i < removeIndex.Count; i++) {
-			j = removeIndex [i];
-			xList.RemoveAt (j);
-			yList.RemoveAt (j);
-		}
-		Debug.Log ("Finished operation 3");
-
-
-		//4th operation: evaluate the mean distance between the points and scale them
-		float mean_distance = Hypot(xList[1] - xList[0], yList[1] - yList[0]);
-		float distance;
-
-		for (int i = 2; i < xList.Count; i++) {
-			distance = Hypot (xList [i] - xList [i - 1], yList [i] - yList [i - 1]);
-			mean_distance = (distance + mean_distance * (i - 1)) / i;
-		}
-		// mean distance must be a scaling factor for the points
-
-		circuitX.Add (RoundToZero(xList [0]));
-		circuitY.Add (RoundToZero(yList [0]));
-		float module, angle, deltaX, deltaY;
-		int scaleModule;
-
-		for (int i = 1, j = 0; i < xList.Count; i++) {
-			module = Hypot (xList[i] - xList[j], yList[i] - yList[j]);
-			angle = Mathf.Atan2 (yList[i] - yList[j], xList[i] - xList[j]) * Mathf.Rad2Deg;
-			scaleModule = RoundToZero (module / mean_distance);
-			if (scaleModule != 0) {
-				if (Mathf.Abs (angle) == 90.0f)
-					deltaX = 0.0f;
-				else
-					deltaX = scaleModule * Mathf.Cos (angle * Mathf.Deg2Rad);
-				if (angle == 0.0f || Mathf.Abs (angle) == 180.0f)
-					deltaY = 0.0f;
-				else
-					deltaY = scaleModule * Mathf.Sin (angle * Mathf.Deg2Rad);
-				circuitX.Add (RoundToZero(xList [j] + deltaX));
-				circuitY.Add (RoundToZero(yList [j] + deltaY));
-				j = i;
-			}
-		}
-		Debug.Log ("Finished operation 4");
-
-		Debug.Log ("Number of entries for the circuit: " + circuitX.Count);
-		// In the end, prints the results in the circuit file
-		for (int i = 0; i < circuitX.Count; i++) {
-			writer.WriteLine ("x = " + circuitX[i] + "|" + " y= " + circuitY[i]);
+		// prints the circuit data in the new file
+		UnityEngine.Debug.Log ("Number of entries for the circuit: " + posX.Count);
+		for (i = 0; i < posX.Count; i++) {
+			writer.WriteLine ("x = " + posX[i] + " | " + " y = " + posY[i]);
 		}
 		writer.Flush();
 		AssetDatabase.SaveAssets ();
 		AssetDatabase.Refresh ();
 
 		writer.Close ();
-		reader.Close ();
 		outputStream.Close ();
-		inputStream.Close ();
 	}
+
 
 	public void BuildCircuit (string circuitPath) {
 
-		Debug.Log ("Started building circuit");
+		UnityEngine.Debug.Log ("Started BuildCircuit");
 
 		FileStream inputStream = File.Open (circuitPath, FileMode.Open, FileAccess.Read);
 		StreamReader reader = new StreamReader (inputStream);
@@ -205,6 +175,7 @@ public class DataManager : MonoBehaviour {
 
 		string entry = reader.ReadLine ();
 		int x, y;
+		// the format of an entry is: "x = (int) | y = (int)"
 		while (entry != null) {
 			if (entry.StartsWith ("x")) {
 				entry.Replace (" ", "");
@@ -219,34 +190,30 @@ public class DataManager : MonoBehaviour {
 			entry = reader.ReadLine ();
 		}
 
-		int angle;
+		DrawStart (circuitX [0], circuitY [0], circuitX [1], circuitY [1]);
 
-		//evaluate the angle between the starting point and the next one
-		angle = RoundToZero((Mathf.Atan2 (circuitY [1] - circuitY [0], circuitX [1] - circuitX [0])) * Mathf.Rad2Deg);
-		// draw the starting tile
-		drawStart (angle);
+		int i = 0;
 
-		for (int i = 1; i < circuitX.Count - 1; i++) {
-			// evaluate the angle respect to the previous point
-			angle = RoundToZero((Mathf.Atan2 (circuitY [i] - circuitY [i + 1], circuitX [i] - circuitX [i + 1])) * Mathf.Rad2Deg);
-			// draw another tile
-			drawStep (angle);
+		for (; i < circuitX.Count - 1; i++) {
+			DrawCurve (circuitX [i - 1], circuitY [i - 1], circuitX [i], circuitY [i], circuitX [i + 1], circuitY [i + 1]);
+			DrawStep (circuitX [i], circuitY [i], circuitX [i + 1], circuitY [i + 1]);
 		}
 
-		// note: angle contains the angle between the last point and the previous one
-		// draw the finish tile
-		drawFinish(angle);
+		drawFinish (circuitX [i], circuitY [i]);
 
 		reader.Close ();
 		inputStream.Close ();
 	}
 
-	void drawStart(int angle) {
+	void DrawStart(int x0, int y0, int x1, int y1) {
 	}
 
-	void drawStep(int angle) {
+	void DrawStep(int x0, int y0, int x1, int y1) {
 	}
 
-	void drawFinish(int angle) {
+	void DrawCurve(int x0, int y0, int x1, int y1, int x2, int y2) {
+	}
+
+	void drawFinish(int Xf, int yf) {
 	}
 }
