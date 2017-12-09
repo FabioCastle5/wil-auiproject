@@ -19,7 +19,7 @@
 	<DebugType>full</DebugType>
 	<Optimize>false</Optimize>
 	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_5_1_0;UNITY_5_1;UNITY_5;UNITY_64;ENABLE_NEW_BUGREPORTER;ENABLE_2D_PHYSICS;ENABLE_4_6_FEATURES;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PHYSICS_PHYSX3;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_LICENSE;ENABLE_AUDIOMIXER_SUSPEND;ENABLE_EDITOR_METRICS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_LOCALIZATION;UNITY_STANDALONE_LINUX;UNITY_STANDALONE;UNITY_STANDALONE_LINUX_API;ENABLE_SUBSTANCE;ENABLE_TEXTUREID_MAP;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_LINUX</DefineConstants>
+	<DefineConstants>DEBUG;TRACE;UNITY_5_1_0;UNITY_5_1;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_2D_PHYSICS;ENABLE_4_6_FEATURES;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PHYSICS_PHYSX3;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_LICENSE;ENABLE_AUDIOMIXER_SUSPEND;ENABLE_EDITOR_METRICS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_LOCALIZATION;UNITY_ANDROID;UNITY_ANDROID_API;ENABLE_SUBSTANCE;ENABLE_TEXTUREID_MAP;ENABLE_EGL;ENABLE_NETWORK;ENABLE_RUNTIME_GI;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_MONO;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_LINUX</DefineConstants>
 	<ErrorReport>prompt</ErrorReport>
 	<WarningLevel>4</WarningLevel>
 	<NoWarn>0169</NoWarn>
@@ -46,13 +46,43 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\ButtonHandler.cs" />
      <Compile Include="Assets\Scripts\CameraManager.cs" />
+     <Compile Include="Assets\Scripts\CircuitData.cs" />
+     <Compile Include="Assets\Scripts\CircuitManager.cs" />
+     <Compile Include="Assets\Scripts\CountdownManager.cs" />
      <Compile Include="Assets\Scripts\DataManager.cs" />
+     <Compile Include="Assets\Scripts\GameData.cs" />
+     <Compile Include="Assets\Scripts\GameLoader.cs" />
+     <Compile Include="Assets\Scripts\MeasureManager.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
-     <None Include="Assets\Files\circuit.txt" />
-     <None Include="Assets\Files\circuit-01-12-201712-50-40.txt" />
-     <None Include="Assets\Files\circuit-01-12-201712-53-50.txt" />
-     <None Include="Assets\Files\xy_measures16.txt" />
+     <Compile Include="Assets\Scripts\WilDataManager.cs" />
+     <None Include="Assets\Files\circuit-05-12-201705-33-35.txt" />
+     <None Include="Assets\Files\circuit-05-12-201712-45-54.txt" />
+     <None Include="Assets\Files\circuit-05-12-201706-23-46.txt" />
+     <None Include="Assets\StreamingAssets\new_circuit.txt" />
+     <None Include="Assets\Files\circuit-05-12-201712-50-14.txt" />
+     <None Include="Assets\Files\circuit-05-12-201706-39-15.txt" />
+     <None Include="Assets\Files\circuit-04-12-201706-46-32.txt" />
+     <None Include="Assets\Files\circuit-04-12-201707-07-29.txt" />
+     <None Include="Assets\Files\circuit-05-12-201705-25-49.txt" />
+     <None Include="Assets\Files\circuit-06-12-201702-12-00.txt" />
+     <None Include="Assets\Files\default_circuit.txt" />
+     <None Include="Assets\StreamingAssets\default_circuit.txt" />
+     <None Include="Assets\Files\circuit-04-12-201707-05-16.txt" />
+     <None Include="Assets\Files\circuit-05-12-201705-26-45.txt" />
+     <None Include="Assets\Files\measures.txt" />
+     <None Include="Assets\Files\circuit-05-12-201705-35-30.txt" />
+     <None Include="Assets\Files\circuit-06-12-201702-09-10.txt" />
+     <None Include="Assets\Files\circuit-04-12-201710-49-00.txt" />
+     <None Include="Assets\Files\circuit-06-12-201701-50-10.txt" />
+     <None Include="Assets\Files\circuit-06-12-201702-19-53.txt" />
+     <None Include="Assets\Files\circuit-06-12-201702-03-30.txt" />
+     <None Include="Assets\Files\New\new_circuit.txt" />
+     <None Include="Assets\Files\circuit-04-12-201709-21-18.txt" />
+     <None Include="Assets\Files\circuit-05-12-201706-12-23.txt" />
+     <None Include="Assets\Files\circuit-06-12-201701-58-52.txt" />
+     <None Include="Assets\Files\circuit-04-12-201707-04-25.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/opt/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

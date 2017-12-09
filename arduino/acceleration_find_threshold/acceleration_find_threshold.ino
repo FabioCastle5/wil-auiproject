@@ -8,37 +8,32 @@
 #include<MPU6050.h>
 
 /*  Offset evaluated <-> Choose optimistic or pessimistic ones
-/*  [2775,2776] --> [-15,7]
- *  [-1979,-1978] --> [-9,5]
- *  [999,1000] --> [16339,16396]
- *  [95,96] --> [-1,1]
- *  [-19,-19] --> [0,3]
- *  [46,47] --> [-2,1] 
- *  
- *  Mean AccX Error: -21.47
- *  Mean AccY Error: -5.95
- *  Dispersion AccX Error: 8.75
- *  Dispersion AccY Error: 9.68
+/*  [2919,2920] --> [-13,2]
+ *  [-1951,-1950] --> [-11,3]
+ *  [997,998] --> [16359,16389]
+ *  [90,91] --> [-2,2]
+ *  [-22,-21] --> [0,4]
+ *  [55,56] --> [0,3]
 */
 
-#define MPU6050_ACCEL_OFFSET_X 2775
-#define MPU6050_ACCEL_OFFSET_Y -1979
-#define MPU6050_ACCEL_OFFSET_Z 999
-#define MPU6050_GYRO_OFFSET_X  95
-#define MPU6050_GYRO_OFFSET_Y  -19
-#define MPU6050_GYRO_OFFSET_Z  46
+#define MPU6050_ACCEL_OFFSET_X 2791
+#define MPU6050_ACCEL_OFFSET_Y -2083
+#define MPU6050_ACCEL_OFFSET_Z 997
+#define MPU6050_GYRO_OFFSET_X  89
+#define MPU6050_GYRO_OFFSET_Y  -23
+#define MPU6050_GYRO_OFFSET_Z  56
 
 #define MPU6050_DLPF_MODE 6
 
 #define INIT_SAMPLES 20
-#define SAMPLES 30
-#define DELTA_T 200
+#define SAMPLES 50
+#define DELTA_T 250
 
 // TOLERANCE defines the threshold which separates a movement from a non-movement
-#define TOLERANCE_PX 200
-#define TOLERANCE_NX -240
-#define TOLERANCE_PY 240
-#define TOLERANCE_NY -280
+#define TOLERANCE_PX 1000
+#define TOLERANCE_NX -1000
+#define TOLERANCE_PY 1000
+#define TOLERANCE_NY -1000
 
 
 // hw variables
@@ -95,9 +90,15 @@ bool tolerable_y(int16_t input) {
 void loop() {
   // takes tot samples of acceleration
   if (n < INIT_SAMPLES) {
+    Wire.beginTransmission(MPU_addr);
+    Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
+    Wire.endTransmission(false);
+    Wire.requestFrom(MPU_addr, 4, true); // request a total of 14 registers
     // reads and skips the first lectures
-    aX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
-    aY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+    aX = Wire.read() << 8; // 0x3B (ACCEL_XOUT_H)
+    aX |= Wire.read(); // 0x3C (ACCEL_XOUT_L)
+    aY = Wire.read() << 8; // 0x3D (ACCEL_YOUT_H)
+    aY |= Wire.read(); // 0x3E (ACCEL_YOUT_L)
     n = n + 1;
   }
   else if (n < INIT_SAMPLES + SAMPLES) {
@@ -108,7 +109,7 @@ void loop() {
     Wire.beginTransmission(MPU_addr);
     Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
     Wire.endTransmission(false);
-    Wire.requestFrom(MPU_addr, 14, true); // request a total of 14 registers
+    Wire.requestFrom(MPU_addr, 4, true); // request a total of 14 registers
 
     //gets acceleration data
     aX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)

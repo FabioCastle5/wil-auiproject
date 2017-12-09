@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
 using System;
@@ -10,210 +9,216 @@ using System.Diagnostics;
 
 public class DataManager : MonoBehaviour {
 
-	public TextAsset measures;
+	public GameObject[] tiles;
+	public GameObject[] flags;
 
-	private List<string> entries;
+	public GameObject circuit;
+	public GameObject circuitInstance;
 
-	private volatile bool finished;
-	private const int readingTime = 30;
-
-
-	void Awake() {
-		UnityEngine.Debug.Log ("Starting awake");
-		entries = new List<string>();
-		finished = false;
-
-		// connect to toy and fill entries with the strings received by it
-		ConnectAndReadData ();
-		
-		// create a new file to save the new cicuit
-		string newFile = "circuit-" + System.DateTime.Now.ToString("dd-MM-yyyy") + System.DateTime.Now.ToString("hh-mm-ss") + ".txt";
-		string newPath = Application.dataPath + "/Files/" + newFile;
-		File.WriteAllText(newPath, String.Empty);
-		AssetDatabase.Refresh();
-
-		// elaborate entries and save data onto the new circuit file
-		ElaborateRawData (newPath);
-		// build the circuit starting from the circuit file created
-		BuildCircuit (newPath);
-	}
+	private const float offsetUp45 = 3.47f;
+	private const int verticalOffset = 12;
+	private const float horizontalOffset = 19.19f;
 
 
-	private void ConnectAndReadData() {
-		UnityEngine.Debug.Log ("Starting ConnectAndReadData");
-
-		TcpClient client = new TcpClient();
-
-		Thread timeThread = new Thread (() => {
-			Thread.Sleep (readingTime * 1000);
-			finished = true;
-		});
-
-		client.Connect("ESP8266-WIL", 80);
-		StreamReader stream = new StreamReader(client.GetStream());
-		timeThread.Start ();
-		// buffer hosts the read string until it isn't finished
-		var buffer = new List<byte>();
-		// (-1|0|1);(0|1)\r - format of the received string
-		while (client.Connected && !finished)
-		{
-			// Read the next byte
-			var read = stream.Read();
-			// a reading is split with the others by the carriage return, symbol = 13
-			if (read == 13)
-			{
-				// reading is finished, convert our buffer to a string and add it to entries
-				string str = Encoding.ASCII.GetString(buffer.ToArray());
-				entries.Add (str);
-				// Clear the buffer ready for another reading
-				buffer.Clear();
-			}
-			else
-				// If this wasn't the end of a reading, then just add this new byte to our buffer
-				buffer.Add((byte)read);
-		}
-	}
-
-
-	public void ElaborateRawData(string newPath) {
-
-		UnityEngine.Debug.Log ("Starting ElaborateRawData");
-
-		List<int> moveX = new List<int> ();
-		List<int> moveY = new List<int> ();
-		List<int> posX = new List<int> ();
-		List<int> posY = new List<int> ();
-
-		int i = 0;
-		int j = 0;
-
-		string outputPath = newPath;
-
-		FileStream outputStream = File.Open (outputPath, FileMode.Open, FileAccess.Write);
-		StreamWriter writer = new StreamWriter (outputStream);
-
-		string entry;
-		// (-1|0|1);(0|1) - format of the single entry in entries
-		for (i = 0; i < entries.Count; i++) {
-			entry = entries [i];
-			if (entry != null) {
-				string[] split = entry.Split (';');
-				// split[0] contains (-1|0|1); split[1] contains (0|1)
-				moveX.Add (int.Parse (split [0]));
-				moveY.Add (int.Parse (split [1]));
-			}
-		}
-
-		// 1st operation: removes the unsupported change in direction, that are the ones
-		// that makes the player going back on its current path(180° curves)
-		i = 0;
-		j = 0;
-
-		while (i < moveX.Count - 1) {
-			if (moveY [i] == 0 && moveX [i] != 0) {
-				for (j = i + 1; j < moveX.Count && moveY [j] != 1; j++)
-					if (moveX [j] == -moveX [i])
-						moveX [j] = 0;
-				i = j;
-			} else
-				i += 1;
-		}
-
-		// 2nd operation: removes the (0,0) moves, which are not useful to evaluate the circuit
-		List<int> removeIndex = new List<int>();
-		for (i = 0; i < moveX.Count; i++) {
-			if (moveX [i] == 0 && moveY [i] == 0)
-				removeIndex.Add (i);
-		}
-
-		removeIndex.Reverse ();
-		for (i = 0; i < removeIndex.Count; i++) {
-			moveX.RemoveAt (removeIndex [i]);
-			moveY.RemoveAt (removeIndex [i]);
-		}
-
-		// evaluation of the circuit: evaluate the position of the toy over each step
-		// the circuit always starts in the position (0,0)
-		posX.Add (0);
-		posY.Add (0);
-		int lastx = 0;
-		int lasty = 0;
-		int px = 0;
-		int py = 0;
-
-		for (i = 0; i < moveX.Count; i++) {
-			px = lastx + moveX [i];
-			py = lasty + moveY [i];
-			posX.Add (px);
-			posY.Add (py);
-			lastx = px;
-			lasty = py;
-		}
-
-		// prints the circuit data in the new file
-		UnityEngine.Debug.Log ("Number of entries for the circuit: " + posX.Count);
-		for (i = 0; i < posX.Count; i++) {
-			writer.WriteLine ("x = " + posX[i] + " | " + " y = " + posY[i]);
-		}
-		writer.Flush();
-		AssetDatabase.SaveAssets ();
-		AssetDatabase.Refresh ();
-
-		writer.Close ();
-		outputStream.Close ();
-	}
-
-
-	public void BuildCircuit (string circuitPath) {
+	public void BuildCircuit () {
 
 		UnityEngine.Debug.Log ("Started BuildCircuit");
 
-		FileStream inputStream = File.Open (circuitPath, FileMode.Open, FileAccess.Read);
-		StreamReader reader = new StreamReader (inputStream);
-		List<int> circuitX = new List<int> ();
-		List<int> circuitY = new List<int> ();
-
-		string entry = reader.ReadLine ();
-		int x, y;
-		// the format of an entry is: "x = (int) | y = (int)"
-		while (entry != null) {
-			if (entry.StartsWith ("x")) {
-				entry.Replace (" ", "");
-				string[] split = entry.Split ('|');
-				string[] splitx = split [0].Split ('=');
-				string[] splity = split [1].Split ('=');
-				x = int.Parse (splitx [1]);
-				y = int.Parse (splity [1]);
-				circuitX.Add (x);
-				circuitY.Add (y);
+		// if the circuit is not that good, draw a default one
+		if (CircuitData.data.BadCircuit ()) {
+			UnityEngine.Debug.Log("Bad circuit: changing it");
+			CircuitData.data.xList.Clear ();
+			CircuitData.data.yList.Clear ();
+			for (int j = 0; j < 5; j++) {
+				CircuitData.data.xList.Add (j);
+				CircuitData.data.yList.Add (0);
 			}
-			entry = reader.ReadLine ();
 		}
 
-		DrawStart (circuitX [0], circuitY [0], circuitX [1], circuitY [1]);
+		List<int> circuitX = CircuitData.data.xList;
+		List<int> circuitY = CircuitData.data.yList;
+		circuitInstance = Instantiate (circuit, Vector3.zero, Quaternion.identity) as GameObject;
+		circuitInstance.GetComponent<CircuitManager> ().Reset ();
 
-		int i = 0;
+		float x = 0f;
+		float y = 0f;
+		DrawStart (circuitX [0], circuitY [0], circuitX [1], circuitY [1], ref x, ref y);
 
+		int i = 1;
 		for (; i < circuitX.Count - 1; i++) {
-			DrawCurve (circuitX [i - 1], circuitY [i - 1], circuitX [i], circuitY [i], circuitX [i + 1], circuitY [i + 1]);
-			DrawStep (circuitX [i], circuitY [i], circuitX [i + 1], circuitY [i + 1]);
+			DrawCurve (circuitX [i - 1], circuitY [i - 1], circuitX [i], circuitY [i], circuitX [i + 1], circuitY [i + 1], ref x, ref y);
+			if (i != circuitX.Count - 2)
+				DrawStep (circuitX [i], circuitY [i], circuitX [i + 1], circuitY [i + 1], ref x, ref y);
 		}
 
-		drawFinish (circuitX [i], circuitY [i]);
-
-		reader.Close ();
-		inputStream.Close ();
+		drawFinish (circuitX [i - 1], circuitY [i - 1], circuitX [i], circuitY [i], x, y);
 	}
 
-	void DrawStart(int x0, int y0, int x1, int y1) {
+
+	/* tile order:
+	 * number 0 and 1 are the straight way vertical and horizontal
+	 * number 2 and 3 are the 45° turned way right and left
+	 * number 4 to 7 are the 90° curves: NE, NW, EN, WN
+	 * 
+	 * tiles' origin point is the center of the tile itself
+	 * 
+	 * as y grows only in the positive axes, the downway directions are not possible
+	*/
+	void DrawStart(int x0, int y0, int x1, int y1, ref float x, ref float y) {
+		DrawStep (x0, y0, x1, y1, ref x, ref y);
+		int direction = 0;
+		if (y0 == y1) {
+			if (x0 < x1)
+				direction = 0;
+			else
+				direction = 180;
+		} else
+			direction = 90;
+		int flagIndex = 0;
+		if (direction != 90)
+			flagIndex = 1;
+		GameObject flag = Instantiate (flags[flagIndex], Vector3.zero, flags[flagIndex].transform.rotation) as GameObject;
+		flag.GetComponent<BoxCollider2D> ().enabled = false;
+		circuitInstance.GetComponent<CircuitManager> ().SetInitialDirection (direction);
 	}
 
-	void DrawStep(int x0, int y0, int x1, int y1) {
+	void DrawStep(int x0, int y0, int x1, int y1, ref float x, ref float y) {
+		// choose the tile to be instantiated
+		int chosenTileIndex = 0;
+		bool up = false;
+		bool right = false;
+		if (x0 == x1) {
+			chosenTileIndex = 0;
+			if (y1 > y0)
+				up = true;
+		} else if (y0 == y1) {
+			chosenTileIndex = 1;
+			if (x1 > x0)
+				right = true;
+		} else if (x1 > x0 && y1 > y0) {
+			chosenTileIndex = 2;
+			x += offsetUp45;
+			right = true;
+		} else if (x1 < x0 && y1 > y0) {
+			chosenTileIndex = 3;
+			x -= offsetUp45;
+		} else if (x1 > x0 && y1 < y0) {
+			chosenTileIndex = 3;
+			x += offsetUp45;
+			right = true;
+		} else {
+			chosenTileIndex = 2;
+			x -= offsetUp45;
+		}
+		// add it to circuit manager
+		circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles[chosenTileIndex]);
+		// update position for the next tile to be instantiated
+		if (chosenTileIndex == 0) {
+			if (up)
+				y += verticalOffset;
+			else
+				y -= verticalOffset;
+		}
+		else if (chosenTileIndex == 1) {
+			if (right)
+				x += horizontalOffset;
+			else
+				x -= horizontalOffset;
+		} else if (chosenTileIndex == 2) {
+			y += verticalOffset;
+			if (right)
+				x += offsetUp45;
+			else
+				x -= offsetUp45;
+		} else {
+			y += verticalOffset;
+			if (right)
+				x += offsetUp45;
+			else
+				x -= offsetUp45;
+		}
 	}
 
-	void DrawCurve(int x0, int y0, int x1, int y1, int x2, int y2) {
+	void DrawCurve(int x0, int y0, int x1, int y1, int x2, int y2, ref float x, ref float y) {
+		// choose wether a curve is needed or not
+		if (y2 == y0 && y0 != y1) {
+			// two curves are needed: it's a going-back
+			if (y1 > y0) {
+				if (x0 > x2) {
+					circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles [5]);
+					x -= horizontalOffset;
+					circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles [4]);
+					y -= verticalOffset;
+				} else if (x0 < x2) {
+					circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles [4]);
+					x += horizontalOffset;
+					circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles [5]);
+					y -= verticalOffset;
+				}
+			} else if (y1 < y0) {
+				if (x0 > x2) {
+					circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles [6]);
+					x -= horizontalOffset;
+					circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles [7]);
+					y += verticalOffset;
+				} else if (x0 < x2) {
+					circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles [7]);
+					x += horizontalOffset;
+					circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles [6]);
+					y += verticalOffset;
+				}
+			}
+		}
+		if (y2 == y0 + 1 || y2 == y0 - 1) {
+			// one curve is needed: it's a change in direction
+			if (y2 > y1) {
+				if (x0 < x1) {
+					// curve EN
+					circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles[6]);
+				} else {
+					// curve WN
+					circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles[7]);
+				}
+				y += verticalOffset;
+			} else if (y2 < y1) {
+				if (x0 < x1) {
+					// curve NW
+					circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles[5]);
+				} else {
+					// curve NE
+					circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles[4]);
+				}
+				y -= verticalOffset;
+			} else { // y1 == y2
+				if (x2 < x1) {
+					if (y1 > y0) {
+						// curve NW
+						circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles[5]);
+					} else {
+						// curve EN
+						circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles[6]);
+					}
+					x -= horizontalOffset;
+				} else { // x2 > x1
+					if (y1 > y0) {
+						// curve NE
+						circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles[4]);
+					} else {
+						// curve WN
+						circuitInstance.GetComponent<CircuitManager> ().AddTile (x, y, tiles[7]);
+					}
+					x += horizontalOffset;
+				}
+			}
+		}
 	}
 
-	void drawFinish(int Xf, int yf) {
+	void drawFinish(int x0, int y0, int x1, int y1, float x, float y) {
+		DrawStep (x0, y0, x1, y1, ref x, ref y);
+		int flagIndex = 0;
+		if (y0 == y1) {
+			flagIndex = 1;
+		}
+		circuitInstance.GetComponent<CircuitManager> ().DrawFinalFlag (flags [flagIndex]);
 	}
 }

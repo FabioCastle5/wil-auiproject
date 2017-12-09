@@ -1,30 +1,42 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System;
 using System.Collections;
 
 public class PlayerController : MonoBehaviour {
 
-	public Sprite[] sprites;
 	public float speed;
 	public int rotationAngle;
 
+	public Image finishScreen;
+
 	private SpriteRenderer renderer;
 	private Rigidbody2D body;
+
+	public Sprite ne;
+	public Sprite nw;
+	public Sprite se;
+	public Sprite sw;
 
 	private int routeDirection;
 	private int offset;
 
 	void Start () {
+		Debug.Log (this.name + " has started!");
 		
 		// get the sprite renderer associated to the player
 		renderer = this.GetComponent<SpriteRenderer> ();
 		// get the RigidBody2d associated to the player
 		body = this.GetComponent<Rigidbody2D> ();
 
-		routeDirection = 90;
 		offset = 0;
 
-		ChangeDirection ();
+		finishScreen.enabled = false;
+	}
+
+	public void SetDirection (int direction) {
+		routeDirection = direction;
+		offset = -offset;
 	}
 
 	// make the player steer in the complementary direction
@@ -46,23 +58,46 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void DrawSprite () {
-		if (offset < 0)
-			renderer.sprite = sprites [0];
-		else
-			renderer.sprite = sprites [1];
+		if (routeDirection == 90) {
+			if (offset < 0)
+				renderer.sprite = ne;
+			else
+				renderer.sprite = nw;
+		} else if (routeDirection == 0) {
+			if (offset < 0)
+				renderer.sprite = se;
+			else
+				renderer.sprite = ne;
+		} else if (routeDirection == 180) {
+			if (offset < 0)
+				renderer.sprite = nw;
+			else
+				renderer.sprite = sw;
+		}
 	}
-
-	//void OnCollisionEnter (Collision other) {
-	//	// touching a wall make the player to slow down
-	//	if (other.gameObject.CompareTag ("Tile")) {
-	//		speed /= 2;
-	//		collided = true;
-	//	}
-	//}
 
 	void FixedUpdate () {
 		if (Input.GetMouseButtonDown (0))
 			ChangeDirection ();
 	}
 
+	// this is called when the player cross a curve and pass for the curve's trigger
+	void OnTriggerEnter2D (Collider2D other) {
+		if (other.CompareTag ("Tile")) {
+			string curveName = other.gameObject.name;
+			if (curveName == "TileCurveNE" || curveName == "TileCurveNE(Clone)")
+				routeDirection = 0;
+			else if (curveName == "TileCurveNW" || curveName == "TileCurveNW(Clone)")
+				routeDirection = 180;
+			else
+				routeDirection = 90;
+			
+			other.enabled = false;
+		} else if (other.CompareTag ("Flag")) {
+			// game is finished
+			body.velocity = Vector2.zero;
+			finishScreen.enabled = true;
+			gameObject.SetActive (false);
+		}
+	}
 }

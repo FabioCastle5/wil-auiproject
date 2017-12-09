@@ -1,26 +1,30 @@
 // Main sketch for Wil toy
 
-#include<Wire.h>
-#include<I2Cdev.h>
-#include<MPU6050.h>
+#include <I2Cdev.h>
+#include <MPU6050.h>
+// Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
+// is used in I2Cdev.h
+#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+    #include <Wire.h>
+#endif
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 
 /*  Offset evaluated <-> Choose optimistic or pessimistic ones
-/*  [2775,2776] --> [-15,7]
- *  [-1979,-1978] --> [-9,5]
- *  [999,1000] --> [16339,16396]
- *  [95,96] --> [-1,1]
- *  [-19,-19] --> [0,3]
- *  [46,47] --> [-2,1]
+/*  [2919,2920] --> [-13,2]
+ *  [-1951,-1950] --> [-11,3]
+ *  [997,998] --> [16359,16389]
+ *  [90,91] --> [-2,2]
+ *  [-22,-21] --> [0,4]
+ *  [55,56] --> [0,3]
 */
 
-#define MPU6050_ACCEL_OFFSET_X 2775
-#define MPU6050_ACCEL_OFFSET_Y -1979
-#define MPU6050_ACCEL_OFFSET_Z 999
-#define MPU6050_GYRO_OFFSET_X  95
-#define MPU6050_GYRO_OFFSET_Y  -19
-#define MPU6050_GYRO_OFFSET_Z  46
+#define MPU6050_ACCEL_OFFSET_X 2791
+#define MPU6050_ACCEL_OFFSET_Y -2083
+#define MPU6050_ACCEL_OFFSET_Z 997
+#define MPU6050_GYRO_OFFSET_X  89
+#define MPU6050_GYRO_OFFSET_Y  -23
+#define MPU6050_GYRO_OFFSET_Z  56
 
 #define MPU6050_DLPF_MODE 6
 
@@ -28,13 +32,13 @@
 #define PASS "WilProject"
 
 #define INIT_SAMPLES 100
-#define DELTA_T 125
+#define DELTA_T 500
 
 // TOLERANCE defines the threshold which separates a movement from a non-movement
-#define TOLERANCE_PX 200
-#define TOLERANCE_NX -240
-#define TOLERANCE_PY 240
-#define TOLERANCE_NY -280
+#define TOLERANCE_PX 800
+#define TOLERANCE_NX -800
+#define TOLERANCE_PY 800
+#define TOLERANCE_NY -800
 
 
 // hw variables
@@ -44,6 +48,7 @@ const int MPU_addr = 0x68; // I2C address of the MPU-6050
 WiFiServer server(80); //Initialize the server on Port 80
 WiFiClient client;
 // measures
+int16_t ax, ay, az;
 int aX, aY;
 int moveX, moveY;
 // measure counter
@@ -56,11 +61,12 @@ unsigned long endingTime;
 void setup() {
   //set the initial values for variables
   n = 0;
-  // setup the accelerometer
-  Wire.begin();
-  Wire.beginTransmission(MPU_addr);
-  Wire.write(0x6B);  // PWR_MGMT_1 register
-  Wire.write(0);     // set to zero (wakes up the MPU-6050)
+  // join I2C bus (I2Cdev library doesn't do this automatically)
+    #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+        Wire.begin();
+    #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
+        Fastwire::setup(400, true);
+    #endif
   mpu.initialize();
   mpu.setXAccelOffset(MPU6050_ACCEL_OFFSET_X);
   mpu.setYAccelOffset(MPU6050_ACCEL_OFFSET_Y);
@@ -69,15 +75,18 @@ void setup() {
   mpu.setYGyroOffset(MPU6050_GYRO_OFFSET_Y);
   mpu.setZGyroOffset(MPU6050_GYRO_OFFSET_Z);
   mpu.setDLPFMode((uint8_t) MPU6050_DLPF_MODE);
-  Wire.endTransmission(true);
+  #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+    Wire.endTransmission(true);
+  #endif
   // setup serial communication and wifi
   Serial.begin(9600);
   WiFi.mode(WIFI_AP); //ESP8266-12E is an AccessPoint
-  WiFi.softAP(ID, PASS);  // Provide the (SSID, password); .
+  WiFi.softAP(ID, PASS);  // Provide the (SSID, password);
   server.begin(); // Start the HTTP Server
   // read some initial values and discard them
   read_some_values();
   Serial.println("--- Server ready ---");
+  Serial.print("Access Point IP: "); Serial.println(WiFi.softAPIP());
 }
 
 
@@ -85,15 +94,22 @@ void loop() {
   // listen for connecting client
   client = server.available();
   if (client) {
+    Serial.println("A client has connected. Serving measures...");
     // there is a client connected <-> the tablet is listening
     while (client.connected()) {
       startingTime = millis();
       // take a measure of acceleration and send data to client
       measure_and_send();
       endingTime = millis();
-      // ensure that measures are taken with constant rate
-      delay(DELTA_T - (endingTime - startingTime));
+      if (endingTime - startingTime < DELTA_T) {
+         // ensure that measures are taken with constant rate
+        delay(DELTA_T - (endingTime - startingTime));
+      }
+      //else
+        Serial.println("Warning: measure rate too high!");
     }
+    Serial.println("Client disconnected");
+    Serial.flush();
   }
   delay(5000);
 }
@@ -102,28 +118,15 @@ void loop() {
 // useful to read and discard some raw data that may be incorrect
 void read_some_values() {
   for (int i = 0; i < INIT_SAMPLES; i ++) {
-    Wire.beginTransmission(MPU_addr);
-    Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
-    Wire.endTransmission(false);
-    Wire.requestFrom(MPU_addr, 14, true); // request a total of 14 registers
-    aX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
-    aY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+    mpu.getAcceleration(&ax, &ay, &az);
   }
 }
 
 
 void measure_and_send() {
-  Wire.beginTransmission(MPU_addr);
-  Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
-  Wire.endTransmission(false);
-  Wire.requestFrom(MPU_addr, 14, true); // request a total of 14 registers
+  mpu.getAcceleration(&ax, &ay, &az);
 
-  //gets acceleration data
-  aX = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
-  aY = Wire.read() << 8 | Wire.read(); // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
-  // measure on y in inverted
-  aY = -aY;
-
+  aX = ax; aY = ay;
   //a movement is perceived only if it caused an acceleration over the tolerance area
   if (aX < TOLERANCE_PX && aX > TOLERANCE_NX)
     moveX = 0;
@@ -133,14 +136,26 @@ void measure_and_send() {
     else
       moveX = 1;
   }
-  if (aY < TOLERANCE_PY) // include aY < 0
+  if (aY < TOLERANCE_PY && aY > TOLERANCE_NY)
     moveY = 0;
-  else
-    moveY = 1;
+  else {
+    if (aY < 0)
+      moveY = -1;
+    else
+      moveY = 1;
+  }
 
   //send results to client - format: (-1|0|1);(0|1)\r
   client.print(moveX);
   client.print(';');
   client.print(moveY);
   client.print('\r');
+  client.flush();
+  Serial.print ("Sent: ");
+  Serial.print(moveX);
+  Serial.print(';');
+  Serial.print(moveY);
+  Serial.println('\r');
+  Serial.flush();
 }
+
