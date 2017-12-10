@@ -23,6 +23,7 @@ public class WilDataManager : MonoBehaviour {
 	public GameObject countdownManager;
 	public GameObject createButton;
 	public GameObject startButton;
+	public int maxPoints;
 
 	private List<string> entries;
 
@@ -105,17 +106,47 @@ public class WilDataManager : MonoBehaviour {
 			
 		// 2nd operation: removes the unsupported change in direction, that are the ones
 		// that makes the player going back on its current path(180° curves)
+		removeIndex = new List<int>();
 		i = 0;
 		j = 0;
 
 		while (i < moveX.Count - 1) {
 			if (moveY [i] == 0 && moveX [i] != 0) {
-				for (j = i + 1; j < moveX.Count && moveY [j] != 1; j++)
-					if (moveX [j] == -moveX [i])
-						moveX [j] = 0;
+				for (j = i + 1; j < moveX.Count && moveY [j] == 0; j++)
+					if (moveX [j] == -moveX [i]) {
+						//moveX [j] = 0; <- this introduces 0,0 move
+						removeIndex.Add(j);
+					}
+				i = j;
+			} else if (moveX [i] == 0 && moveY [i] != 0) {
+				for (j = i + 1; j < moveX.Count && moveX [j] == 0; j++)
+					if (moveY [j] == -moveY [i]) {
+						//moveY [j] = 0; <- this introduces 0,0 move
+						removeIndex.Add(j);
+					}
 				i = j;
 			} else
 				i += 1;
+		}
+
+		removeIndex.Reverse ();
+		for (i = 0; i < removeIndex.Count; i++) {
+			moveX.RemoveAt (removeIndex [i]);
+			moveY.RemoveAt (removeIndex [i]);
+		}
+
+		while (moveX.Count > maxPoints + 2) {
+			removeIndex = new List<int>();
+
+			for (i = 0; i < moveX.Count; i++)
+				if (i % 2 == 0)
+					removeIndex.Add (i);
+
+			removeIndex.Reverse ();
+			for (i = 0; i < removeIndex.Count; i++) {
+				moveX.RemoveAt (removeIndex [i]);
+				moveY.RemoveAt (removeIndex [i]);
+			}
 		}
 
 		// evaluation of the circuit: evaluate the position of the toy over each step

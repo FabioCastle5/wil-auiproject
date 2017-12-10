@@ -72,10 +72,14 @@ public class DataManager : MonoBehaviour {
 				direction = 0;
 			else
 				direction = 180;
-		} else
-			direction = 90;
+		} else {
+			if (y0 < y1)
+				direction = 90;
+			else //y0 > y1
+				direction = 270;
+		}
 		int flagIndex = 0;
-		if (direction != 90)
+		if (direction == 0 || direction == 180)
 			flagIndex = 1;
 		GameObject flag = Instantiate (flags[flagIndex], Vector3.zero, flags[flagIndex].transform.rotation) as GameObject;
 		flag.GetComponent<BoxCollider2D> ().enabled = false;
@@ -99,9 +103,11 @@ public class DataManager : MonoBehaviour {
 			chosenTileIndex = 2;
 			x += offsetUp45;
 			right = true;
+			up = true;
 		} else if (x1 < x0 && y1 > y0) {
 			chosenTileIndex = 3;
 			x -= offsetUp45;
+			up = true;
 		} else if (x1 > x0 && y1 < y0) {
 			chosenTileIndex = 3;
 			x += offsetUp45;
@@ -124,14 +130,11 @@ public class DataManager : MonoBehaviour {
 				x += horizontalOffset;
 			else
 				x -= horizontalOffset;
-		} else if (chosenTileIndex == 2) {
-			y += verticalOffset;
-			if (right)
-				x += offsetUp45;
+		} else { // 2 or 3
+			if (up)
+				y += verticalOffset;
 			else
-				x -= offsetUp45;
-		} else {
-			y += verticalOffset;
+				y -= verticalOffset;
 			if (right)
 				x += offsetUp45;
 			else

@@ -35,10 +35,10 @@
 #define DELTA_T 500
 
 // TOLERANCE defines the threshold which separates a movement from a non-movement
-#define TOLERANCE_PX 800
-#define TOLERANCE_NX -800
-#define TOLERANCE_PY 800
-#define TOLERANCE_NY -800
+#define TOLERANCE_PX 1000
+#define TOLERANCE_NX -1000
+#define TOLERANCE_PY 1000
+#define TOLERANCE_NY -1000
 
 
 // hw variables
@@ -111,7 +111,7 @@ void loop() {
     Serial.println("Client disconnected");
     Serial.flush();
   }
-  delay(5000);
+  delay(500);
 }
 
 

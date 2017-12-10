@@ -30,11 +30,9 @@ public class CircuitData : MonoBehaviour {
 
 	public bool BadCircuit() {
 		Debug.Log ("Entered bad circuit");
-		Debug.Log ("Count: " + xList.Count);
 		bool answer = false;;
 		if (xList.Count < 2)
 			answer = true;
-		Debug.Log ("Answer: " + answer);
 		return answer;
 	}
 

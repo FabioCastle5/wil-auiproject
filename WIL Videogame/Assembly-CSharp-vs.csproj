@@ -56,6 +56,7 @@
      <Compile Include="Assets\Scripts\GameLoader.cs" />
      <Compile Include="Assets\Scripts\MeasureManager.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
+     <Compile Include="Assets\Scripts\TimerManager.cs" />
      <Compile Include="Assets\Scripts\WilDataManager.cs" />
      <None Include="Assets\Files\circuit-05-12-201705-33-35.txt" />
      <None Include="Assets\Files\circuit-05-12-201712-45-54.txt" />

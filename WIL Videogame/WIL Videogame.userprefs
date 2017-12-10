@@ -1,13 +1,12 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/CountdownManager.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/CircuitManager.cs">
     <Files>
-      <File FileName="Assets/Scripts/CircuitManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/GameData.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/GameData.cs" Line="25" Column="3" />
       <File FileName="Assets/Scripts/CircuitData.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/WilDataManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/MeasureManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/CountdownManager.cs" Line="48" Column="29" />
+      <File FileName="Assets/Scripts/PlayerController.cs" Line="148" Column="31" />
+      <File FileName="Assets/Scripts/CircuitManager.cs" Line="121" Column="15" />
+      <File FileName="Assets/Scripts/CameraManager.cs" Line="15" Column="60" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

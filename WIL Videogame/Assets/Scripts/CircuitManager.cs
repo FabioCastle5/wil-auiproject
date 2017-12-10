@@ -1,16 +1,78 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
 public class CircuitManager : MonoBehaviour {
 
+	public int simultaneousTiles;
+	public GameObject vCheckpoint;
+	public GameObject hCheckpoint;
+	public Image advanceBar;
+	private float deltaXBar;
+	private float initialWidth;
+
 	private List<TileData> tiles;
+//	private GameObject checkpointInstance;
+	private int nextTile;
+	private Queue<GameObject> activeTiles;
 
 	private const float offsetUp45 = 3.47f;
 	private const int verticalOffset = 12;
 	private const float horizontalOffset = 19.19f;
 
 	private int initialDirection;
+
+	private volatile bool updated;
+	private int checkpointIndex;
+
+	void Start() {
+		updated = false;
+	}
+
+	void Update () {
+		if (updated) {
+			Debug.Log ("CircuitManager updating");
+			updated = false;
+
+			// draw next tile
+			if (checkpointIndex > 2)
+				DrawNextTile ();
+			
+			// fulfil advance bar
+			float dim = deltaXBar * (checkpointIndex + 1);
+			Debug.Log("Initial width: " + initialWidth + " Index: " + checkpointIndex + " Actual: " + dim);
+			float proposition = dim / initialWidth;
+			Debug.Log ("Proposition: " + proposition);
+			advanceBar.transform.localScale = new Vector3(proposition, 1f, 1f);
+
+			// advance checkpointbar
+			if (checkpointIndex < tiles.Count - 1) {
+				checkpointIndex++;
+				Debug.Log ("Checkpoint index now: " + checkpointIndex);
+				float newX = tiles [checkpointIndex].x;
+				float newY = tiles [checkpointIndex].y;
+
+				bool horizontal = false;
+				if (tiles [checkpointIndex].tileObject.name.Contains ("TileEW")) {
+					// must be rotated 90°
+					horizontal = true;
+				} else if (tiles [checkpointIndex].tileObject.name.Contains ("CurveNE") || tiles [checkpointIndex].tileObject.name.Contains ("CurveWN")) {
+					horizontal = true;
+					newX += 9f;
+				} else if (tiles [checkpointIndex].tileObject.name.Contains ("Curve")) {
+					horizontal = true;
+					newX -= 9f;
+				}
+				Vector3 pos = new Vector3 (newX, newY, 0f);
+				if (horizontal) {
+					Instantiate (hCheckpoint, pos, hCheckpoint.transform.rotation);
+				} else {
+					Instantiate (vCheckpoint, pos, vCheckpoint.transform.rotation);
+				}
+			}
+		}
+	}
 	
 	public void AddTile (float x, float y, GameObject tile) {
 		if (tiles == null)
@@ -19,12 +81,15 @@ public class CircuitManager : MonoBehaviour {
 		newTile.x = x;
 		newTile.y = y;
 		newTile.tileObject = tile;
-		newTile.tileObject.transform.SetParent (gameObject.transform);
+		tiles.Add (newTile);
 	}
 
 	public void Reset () {
 		tiles = new List<TileData>();
+		activeTiles = new Queue<GameObject> (simultaneousTiles);
 		initialDirection = 0;
+		nextTile = 0;
+		updated = false;
 	}
 
 	public void SetInitialDirection(int direction) {
@@ -43,6 +108,57 @@ public class CircuitManager : MonoBehaviour {
 		float y = tiles[i].y;
 		GameObject instance = Instantiate (flag, new Vector3(x,y,0f), flag.transform.rotation) as GameObject;
 		instance.GetComponent<BoxCollider2D> ().enabled = true;
+	}
+
+	public void DrawNextTile () {
+		if (nextTile < tiles.Count) {
+			Debug.Log ("Drawing a new tile");
+			GameObject oldTile = activeTiles.Dequeue ();
+			Destroy (oldTile);
+			TileData newTileData = tiles [nextTile];
+			GameObject newTile = Instantiate (newTileData.tileObject, new Vector3 (newTileData.x, newTileData.y, 0f), Quaternion.identity) as GameObject;
+			activeTiles.Enqueue (newTile);
+			nextTile++;
+		}
+	}
+
+	public void StartDrawing () {
+		for (; nextTile < simultaneousTiles && nextTile < tiles.Count; nextTile++) {
+			TileData newTileData = tiles [nextTile];
+			GameObject newTile = Instantiate (newTileData.tileObject, new Vector3 (newTileData.x, newTileData.y, 0f), Quaternion.identity) as GameObject;
+			activeTiles.Enqueue (newTile);
+		}
+		SetCheckpoint ();
+	}
+
+	void SetCheckpoint () {
+		// evaluate the deltax for the bar at every checkpoint and draw it with 0 width
+		RectTransform rt = (RectTransform)advanceBar.gameObject.transform;
+		this.initialWidth = rt.rect.width;
+		this.deltaXBar = initialWidth / (tiles.Count);
+		float proposition = deltaXBar / initialWidth;
+		Debug.Log ("Initial width: " + initialWidth);
+		Debug.Log ("Delta x bar: " + deltaXBar);
+		Debug.Log ("Number of tiles: " + tiles.Count);
+		advanceBar.transform.localScale = new Vector3(proposition, 1f, 1f);
+		if (tiles.Count > 1) {
+			bool horizontal = false;
+			Vector3 pos = new Vector3 (tiles[1].x, tiles[1].y, 0f);
+			if (tiles [1].tileObject.name == "TileEW" || tiles [1].tileObject.name == "TileEW(Clone)") {
+				// must be rotated 90°
+				horizontal = true;
+			}
+			if (horizontal) {
+				Instantiate (hCheckpoint, pos, hCheckpoint.transform.rotation);
+			} else {
+				Instantiate (vCheckpoint, pos, vCheckpoint.transform.rotation);
+			}
+			checkpointIndex = 1;
+		}
+	}
+
+	public void NextCheckpoint () {
+		updated = true;
 	}
 }
 
