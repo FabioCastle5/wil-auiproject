@@ -135,6 +135,8 @@ public class WilDataManager : MonoBehaviour {
 			moveY.RemoveAt (removeIndex [i]);
 		}
 
+		maxPoints = GameData.data.maxNumberOfTiles;
+
 		while (moveX.Count > maxPoints + 2) {
 			removeIndex = new List<int>();
 
@@ -182,6 +184,6 @@ public class WilDataManager : MonoBehaviour {
 	public void startGame() {
 		UnityEngine.Debug.Log ("Now the game starts");
 		startButton.GetComponent<ButtonHandler> ().DisableClick ();
-		Application.LoadLevel (1);
+		Application.LoadLevel (GameData.data.sceneToBeLoaded);
 	}
 }

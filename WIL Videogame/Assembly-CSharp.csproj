@@ -52,11 +52,15 @@
      <Compile Include="Assets\Scripts\CircuitManager.cs" />
      <Compile Include="Assets\Scripts\CountdownManager.cs" />
      <Compile Include="Assets\Scripts\DataManager.cs" />
+     <Compile Include="Assets\Scripts\DecoratorManager.cs" />
      <Compile Include="Assets\Scripts\GameData.cs" />
      <Compile Include="Assets\Scripts\GameLoader.cs" />
      <Compile Include="Assets\Scripts\MeasureManager.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\TimerManager.cs" />
+     <Compile Include="Assets\Scripts\ViewCircuitLoader.cs" />
+     <Compile Include="Assets\Scripts\ViewCircuitManager.cs" />
+     <Compile Include="Assets\Scripts\ViewDataManager.cs" />
      <Compile Include="Assets\Scripts\WilDataManager.cs" />
      <None Include="Assets\Files\circuit-05-12-201705-33-35.txt" />
      <None Include="Assets\Files\circuit-05-12-201712-45-54.txt" />
@@ -76,6 +80,7 @@
      <None Include="Assets\Files\circuit-05-12-201705-35-30.txt" />
      <None Include="Assets\Files\circuit-06-12-201702-09-10.txt" />
      <None Include="Assets\Files\circuit-04-12-201710-49-00.txt" />
+     <None Include="Assets\Font\OFL.txt" />
      <None Include="Assets\Files\circuit-06-12-201701-50-10.txt" />
      <None Include="Assets\Files\circuit-06-12-201702-19-53.txt" />
      <None Include="Assets\Files\circuit-06-12-201702-03-30.txt" />

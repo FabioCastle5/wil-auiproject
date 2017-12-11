@@ -1,12 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/CircuitManager.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/GameData.cs">
     <Files>
-      <File FileName="Assets/Scripts/GameData.cs" Line="25" Column="3" />
-      <File FileName="Assets/Scripts/CircuitData.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/PlayerController.cs" Line="148" Column="31" />
-      <File FileName="Assets/Scripts/CircuitManager.cs" Line="121" Column="15" />
-      <File FileName="Assets/Scripts/CameraManager.cs" Line="15" Column="60" />
+      <File FileName="Assets/Scripts/GameData.cs" Line="57" Column="29" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

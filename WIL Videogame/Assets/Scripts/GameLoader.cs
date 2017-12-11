@@ -31,6 +31,8 @@ public class GameLoader : MonoBehaviour {
 
 		GameData.data.circuitMananger = circuit;
 
+		Destroy (builder);
+
 		// loads the player and set its initial direction
 		GameObject pl = Instantiate(player, Vector3.zero, Quaternion.identity) as GameObject;
 		pl.GetComponent<PlayerController> ().finishScreen = finishImage;
@@ -47,5 +49,6 @@ public class GameLoader : MonoBehaviour {
 		if (! GameData.data.started)
 			GameData.data.started = true;
 		Destroy (startButton);
+		Destroy (gameObject);
 	}
 }
