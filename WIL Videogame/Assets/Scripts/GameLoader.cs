@@ -6,20 +6,18 @@ public class GameLoader : MonoBehaviour {
 
 	public GameObject circuitBuilder;
 	public GameObject player;
+	public GameObject timer;
 	public GameObject main_camera;
 	public Image finishImage;
 	public Image advanceBar;
 	public Button startButton;
 
-//	public static GameLoader instance = null;
-
 	// Use this for initialization
 	void Start () {
-//
-//		if (instance == null) {
-//			instance = this;
 
 		GameData.data.startButton = startButton;
+		finishImage.enabled = false;
+		GameData.data.finishScreen = finishImage;
 
 		// loads the circuit
 		GameObject builder = Instantiate (circuitBuilder, Vector3.zero, Quaternion.identity) as GameObject;
@@ -32,22 +30,19 @@ public class GameLoader : MonoBehaviour {
 		GameData.data.circuitMananger = circuit;
 
 		Destroy (builder);
+		Destroy (CircuitData.data);
 
-		// loads the player and set its initial direction
+		// loads the player
 		GameObject pl = Instantiate(player, Vector3.zero, Quaternion.identity) as GameObject;
-		pl.GetComponent<PlayerController> ().finishScreen = finishImage;
 
 		GameData.data.player = pl;
+		GameData.data.timer = timer;
 
 		main_camera.GetComponent<CameraManager> ().SetPlayer (pl);
-//		}
-//		else if (instance != this)
-//			Destroy(gameObject);
 	}
 
 	public void StartGame() {
-		if (! GameData.data.started)
-			GameData.data.started = true;
+		timer.GetComponent<TimerManager> ().StartCoroutine ("TrackTime");
 		Destroy (startButton);
 		Destroy (gameObject);
 	}

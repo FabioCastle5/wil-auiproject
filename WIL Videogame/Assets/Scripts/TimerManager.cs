@@ -6,24 +6,27 @@ public class TimerManager : MonoBehaviour {
 
 	public Text timeText;
 	private int time;
-	private float timePassed;
+	private bool stop;
 
 	void Start () {
 		time = 0;
-		timePassed = 0;
+		stop = false;
 		timeText.text = "00:00";
 	}
 
-	void Update () {
-		if (GameData.data.started) {
-			timePassed += Time.deltaTime;
-			if (timePassed >= 1f) {
-				time++;
-				string minutes = (time / 60).ToString("00");
-				string seconds = (time % 60).ToString("00");
-				timeText.text = minutes + ":" + seconds;
-				timePassed = 0f;
-			}
+	public IEnumerator TrackTime () {
+		string minutes = "";
+		string seconds = "";
+		while (!stop) {
+			time++;
+			minutes = (time / 60).ToString ("00");
+			seconds = (time % 60).ToString ("00");
+			timeText.text = minutes + ":" + seconds;
+			yield return new WaitForSeconds (1);
 		}
+	}
+
+	public void StopTimer () {
+		stop = true;
 	}
 }

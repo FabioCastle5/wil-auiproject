@@ -48,11 +48,17 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\ButtonHandler.cs" />
      <Compile Include="Assets\Scripts\CameraManager.cs" />
+     <Compile Include="Assets\Scripts\CheckpointHandler.cs" />
      <Compile Include="Assets\Scripts\CircuitData.cs" />
      <Compile Include="Assets\Scripts\CircuitManager.cs" />
      <Compile Include="Assets\Scripts\CountdownManager.cs" />
+     <Compile Include="Assets\Scripts\CurveENHandler.cs" />
+     <Compile Include="Assets\Scripts\CurveNEHandler.cs" />
+     <Compile Include="Assets\Scripts\CurveNWHandler.cs" />
+     <Compile Include="Assets\Scripts\CurveWNHandler.cs" />
      <Compile Include="Assets\Scripts\DataManager.cs" />
      <Compile Include="Assets\Scripts\DecoratorManager.cs" />
+     <Compile Include="Assets\Scripts\FlagHandler.cs" />
      <Compile Include="Assets\Scripts\GameData.cs" />
      <Compile Include="Assets\Scripts\GameLoader.cs" />
      <Compile Include="Assets\Scripts\MeasureManager.cs" />

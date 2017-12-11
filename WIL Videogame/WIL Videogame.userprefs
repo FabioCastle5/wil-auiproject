@@ -2,7 +2,12 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/GameData.cs">
     <Files>
-      <File FileName="Assets/Scripts/GameData.cs" Line="57" Column="29" />
+      <File FileName="Assets/Scripts/GameData.cs" Line="17" Column="1" />
+      <File FileName="Assets/Scripts/CircuitManager.cs" Line="15" Column="31" />
+      <File FileName="Assets/Scripts/GameLoader.cs" Line="44" Column="27" />
+      <File FileName="Assets/Scripts/PlayerController.cs" Line="9" Column="27" />
+      <File FileName="Assets/Scripts/TimerManager.cs" Line="8" Column="19" />
+      <File FileName="Assets/Scripts/FlagHandler.cs" Line="10" Column="67" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

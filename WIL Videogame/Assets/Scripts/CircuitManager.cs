@@ -13,7 +13,6 @@ public class CircuitManager : MonoBehaviour {
 	private float initialWidth;
 
 	private List<TileData> tiles;
-//	private GameObject checkpointInstance;
 	private int nextTile;
 	private Queue<GameObject> activeTiles;
 
@@ -23,55 +22,52 @@ public class CircuitManager : MonoBehaviour {
 
 	private int initialDirection;
 
-	private volatile bool updated;
 	private int checkpointIndex;
 
-	void Start() {
-		updated = false;
-	}
 
-	void Update () {
-		if (updated) {
-			Debug.Log ("CircuitManager updating");
-			updated = false;
+	public IEnumerator NextCheckpoint() {
+		Debug.Log ("CircuitManager updating");
+		checkpointIndex++;
 
-			// draw next tile
-			if (checkpointIndex > 2)
-				DrawNextTile ();
-			
-			// fulfil advance bar
-			float dim = deltaXBar * (checkpointIndex + 1);
-			Debug.Log("Initial width: " + initialWidth + " Index: " + checkpointIndex + " Actual: " + dim);
-			float proposition = dim / initialWidth;
-			Debug.Log ("Proposition: " + proposition);
-			advanceBar.transform.localScale = new Vector3(proposition, 1f, 1f);
+		// advance checkpointbar
+		if (checkpointIndex < tiles.Count) {
+			Debug.Log ("Checkpoint index now: " + checkpointIndex);
+			float newX = tiles [checkpointIndex].x;
+			float newY = tiles [checkpointIndex].y;
 
-			// advance checkpointbar
-			if (checkpointIndex < tiles.Count - 1) {
-				checkpointIndex++;
-				Debug.Log ("Checkpoint index now: " + checkpointIndex);
-				float newX = tiles [checkpointIndex].x;
-				float newY = tiles [checkpointIndex].y;
-
-				bool horizontal = false;
-				if (tiles [checkpointIndex].tileObject.name.Contains ("TileEW")) {
-					// must be rotated 90°
-					horizontal = true;
-				} else if (tiles [checkpointIndex].tileObject.name.Contains ("CurveNE") || tiles [checkpointIndex].tileObject.name.Contains ("CurveWN")) {
-					horizontal = true;
-					newX += 9f;
-				} else if (tiles [checkpointIndex].tileObject.name.Contains ("Curve")) {
-					horizontal = true;
-					newX -= 9f;
-				}
-				Vector3 pos = new Vector3 (newX, newY, 0f);
-				if (horizontal) {
-					Instantiate (hCheckpoint, pos, hCheckpoint.transform.rotation);
-				} else {
-					Instantiate (vCheckpoint, pos, vCheckpoint.transform.rotation);
-				}
+			bool horizontal = false;
+			if (tiles [checkpointIndex].tileObject.name.Contains ("TileEW")) {
+				// must be rotated 90°
+				horizontal = true;
+			} else if (tiles [checkpointIndex].tileObject.name.Contains ("CurveNE") || tiles [checkpointIndex].tileObject.name.Contains ("CurveWN")) {
+				horizontal = true;
+				newX += 9f;
+			} else if (tiles [checkpointIndex].tileObject.name.Contains ("Curve")) {
+				horizontal = true;
+				newX -= 9f;
+			}
+			Vector3 pos = new Vector3 (newX, newY, 0f);
+			if (horizontal) {
+				Instantiate (hCheckpoint, pos, hCheckpoint.transform.rotation);
+			} else {
+				Instantiate (vCheckpoint, pos, vCheckpoint.transform.rotation);
 			}
 		}
+
+		yield return null;
+
+		// draw next tile
+		if (checkpointIndex >= 2)
+			DrawNextTile ();
+
+		yield return null;
+
+		// fulfil advance bar
+		float dim = deltaXBar * (checkpointIndex - 1);
+		Debug.Log("Initial width: " + initialWidth + " Index: " + checkpointIndex + " Actual: " + dim);
+		float proposition = dim / initialWidth;
+		Debug.Log ("Proposition: " + proposition);
+		advanceBar.transform.localScale = new Vector3(proposition, 1f, 1f);
 	}
 	
 	public void AddTile (float x, float y, GameObject tile) {
@@ -89,7 +85,6 @@ public class CircuitManager : MonoBehaviour {
 		activeTiles = new Queue<GameObject> (simultaneousTiles);
 		initialDirection = 0;
 		nextTile = 0;
-		updated = false;
 	}
 
 	public void SetInitialDirection(int direction) {
@@ -136,7 +131,7 @@ public class CircuitManager : MonoBehaviour {
 		RectTransform rt = (RectTransform)advanceBar.gameObject.transform;
 		this.initialWidth = rt.rect.width;
 		this.deltaXBar = initialWidth / (tiles.Count);
-		float proposition = deltaXBar / initialWidth;
+		float proposition = deltaXBar / initialWidth / 10;
 		Debug.Log ("Initial width: " + initialWidth);
 		Debug.Log ("Delta x bar: " + deltaXBar);
 		Debug.Log ("Number of tiles: " + tiles.Count);
@@ -155,10 +150,6 @@ public class CircuitManager : MonoBehaviour {
 			}
 			checkpointIndex = 1;
 		}
-	}
-
-	public void NextCheckpoint () {
-		updated = true;
 	}
 }
 

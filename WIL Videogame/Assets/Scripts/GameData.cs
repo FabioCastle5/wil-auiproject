@@ -13,9 +13,10 @@ public class GameData : MonoBehaviour {
 
 	public GameObject circuitMananger;
 	public GameObject player;
+	public GameObject timer;
 
-	public bool started;
 	public Button startButton;
+	public Image finishScreen;
 
 	// Singleton and data accessible from anywhere
 	void Awake () {
