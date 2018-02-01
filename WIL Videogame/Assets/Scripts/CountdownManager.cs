@@ -79,6 +79,18 @@ public class CountdownManager : MonoBehaviour {
 		secondThread.Start ();
 	}
 
+	// called by the main thread to end the circuit registration
+	public void StopTimer() {
+		finished = true;
+		countdownText.text = "";
+		if (timerThread.IsAlive)
+			timerThread.Abort ();
+	}
+
+	public void ResetTimer() {
+		secondsPassed = 0;
+	}
+
 	void CountDown () {
 		for (int i = 0; i < measuringSeconds; i++) {
 			secondsPassed = i;

@@ -1,0 +1,40 @@
+MEASURE 1:
+Ax = -0.025			|			Ay = -0.05
+MEASURE 2:
+Ax = -0.0325			|			Ay = -0.04
+MEASURE 3:
+Ax = -0.28			|			Ay = -0.1025
+MEASURE 4:
+Ax = -0.0925			|			Ay = -0.0275
+MEASURE 5:
+Ax = 0.0175			|			Ay = -0.0775
+MEASURE 6:
+Ax = 0.115			|			Ay = -0.0075
+MEASURE 7:
+Ax = -0.035			|			Ay = -0.0575
+MEASURE 8:
+Ax = -0.035			|			Ay = -0.05
+MEASURE 9:
+Ax = -0.03			|			Ay = -0.0625
+MEASURE 10:
+Ax = -0.03			|			Ay = -0.06
+MEASURE 11:
+Ax = -0.03			|			Ay = -0.06
+MEASURE 12:
+Ax = -0.03			|			Ay = -0.06
+MEASURE 13:
+Ax = -0.03			|			Ay = -0.06
+MEASURE 14:
+Ax = -0.03			|			Ay = -0.06
+MEASURE 15:
+Ax = -0.03			|			Ay = -0.06
+MEASURE 16:
+Ax = -0.03			|			Ay = -0.06
+MEASURE 17:
+Ax = -0.03			|			Ay = -0.06
+MEASURE 18:
+Ax = -0.03			|			Ay = -0.06
+MEASURE 19:
+Ax = -0.03			|			Ay = -0.06
+MEASURE 20:
+Ax = -0.03			|			Ay = -0.06

@@ -24,7 +24,16 @@ public class ViewCircuitLoader : MonoBehaviour {
 		float top = 0f;
 		circuit.GetComponent<ViewCircuitManager> ().EvaluateCameraDimensions (ref left, ref top, ref height, ref width);
 
+		float cameraX = left + (width / 2);
+		float cameraY = top - (height / 2);
+		Vector3 cameraPosition = new Vector3 (cameraX, cameraY, -10f);
+
 		main_camera.orthographic = true;
 		main_camera.orthographicSize = Mathf.Max(height / 2, width / 2);
+		main_camera.transform.position = cameraPosition;
+	}
+
+	public void RestartGame() {
+		Application.LoadLevel (0);
 	}
 }

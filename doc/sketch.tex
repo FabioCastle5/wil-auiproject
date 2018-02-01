@@ -1,0 +1,73 @@
+\documentclass[documentation.tex]{subfiles}
+\begin{document}
+	Il software eseguito dal circuito presente nel giocattolo risiede in uno sketch salvato ed eseguito dal microcontrollore(vedi sezione hardware). Tale sketch è stato sviluppato usando la IDE ufficiale di Arduino(versione attuale 1.8.5), che è compatibile con la scheda Wemos D1 mini utilizzata.
+	\subsubsection{Caratteristiche}
+	\begin{itemize}
+		\item \textbf{Leggerezza:} Lo sketch deve avere delle dimensioni ridotte e richiedere una potenza di calcolo adatta a un microcontrollore.
+		\item \textbf{Disponibilità:} Il videogioco deve ricevere delle misure dal circuito ogni volta che ne ha bisogno.
+		\item \textbf{Indipendenza:} La comunicazione tra circuito e tablet dev'essere possibile indipendentemente dalla presenza di una rete internet pubblica.
+	\end{itemize}
+	\subsubsection{Funzionalità}
+	Le funzionalità principali dello sketch sono la creazione di una rete internet a cui il videogioco si può connettere per ricevere le misure dell'accelerometro e l'invio di tali misure quando richiesto dal videogioco stesso. Affinchè possano essere inviate delle misure significative, lo sketch calcola inoltre il valore medio dell'errore di misura e lo elimina dai dati ricevuti dall'accelerometro.
+		\begin{itemize}
+			\item \textbf{Access Point:} il Wemos D1 mini viene configurato in modalità Access Point. In questo modo il tablet può connettersi attraverso una connessione TCP con la scheda senza che debba essere presente una rete internet pubblica tra i due.
+			\item \textbf{Errore medio:} il calcolo dell'errore medio di misura viene fatto quando il circuito è "a riposo", cioè in fase di avviamento dello sketch e quando non c'è alcuna comunicazione con un client. L'assunzione che è stata fatta è che finchè non viene avviata la fase di registrazione del percorso, il giocattolo rimanga in posizione orizzontale su una superficie non inclinata. La formula utilizzata per il calcolo della media è quella riportata nello sketch.
+			\item \textbf{Invio delle misure:} La comunicazione delle misure tra scheda e tablet viene avviata e terminata dal videgioco(sul tablet). La scheda si comporta da server che aspetta delle richieste da parte di un client.
+		\end{itemize}
+	\subsubsection{Sketch}
+	Vengono riportate le parti principali dello sketch.
+	
+	\begin{lstlisting}[language=Arduino]
+// include neccessary libraries and define variables and constants
+	
+void setup() {
+	// initialize the accelerometer and serial communication
+  	
+  	// setup serial communication and wifi
+  	WiFi.mode(WIFI_AP); 	// Access Point
+  	WiFi.softAP(ID, PASS); 	// Set (SSID, password)
+  	server.begin(); 		// Start the HTTP Server
+ 
+  	// read some initial values and discard them
+  
+  	// evaluate the mean error
+  	evaluate_offset(AVG_SAMPLES);
+}
+	
+void evaluate_offset(int samples) {
+  	for (int i = 0; i < samples; i ++) {
+    // setup avg_samples and aX, aY
+    
+    // incremental mean formula
+    avgx = (aX + (avg_samples - 1) * avgx) / avg_samples;
+    avgy = (aY + (avg_samples - 1) * avgy) / avg_samples;
+}
+  	
+void loop() {
+  	// listen for connecting client
+  	client = server.available();
+  	if (client) {
+    	// there is a client connected <-> the tablet is listening
+    	while (client.connected()) {
+      		// take a measure of acceleration and send data to client
+      		measure_and_send();
+    	}
+    	// client disconnected
+  	}
+  	// update mean error
+  	delay(500);
+}
+
+void measure_and_send() {
+  	// measure aX, aY from accelerometer
+
+	// discard the mean error
+  	aX = aX - avgx;
+  	aY = aY - avgy;
+
+  	//send measure to client - format: (ax);(ay)\r
+}
+	\end{lstlisting}
+	
+	\paragraph{Nota} Come si può osservare, lo sketch non prevede il filtraggio delle misure dell'accelerometro. Tale funzionalità è affidata al videogioco, insieme a ulteriori trasformazioni ai dati inviati dalla scheda che consentano di costruire un percorso giocabile.
+\end{document}

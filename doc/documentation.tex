@@ -1,0 +1,30 @@
+\documentclass[12pt,a4paper]{book}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{subfiles}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage{caption}
+\lstdefinestyle{csharp}{language=[Sharp]C, frame=lr, rulecolor=\color{blue!80!black}}
+\renewcommand*{\thesection}{\arabic{section}}
+\author{Fabio Castello}
+\input{arduinoLanguage.tex}  
+\begin{document}
+	\chapter*{Implementation}
+	\addcontentsline{toc}{chapter}{Implementation}
+	\setcounter{chapter}{1}
+	\section{Hardware}
+		\subfile{hardware.tex}
+	\newpage
+	\section{Software}
+		\subfile{intro.tex}
+		\subsection{Hardware Sketch}
+			\subfile{sketch.tex}
+		\subsection{Videogioco}
+			\subfile{game.tex}
+\end{document}

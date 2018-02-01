@@ -23,11 +23,14 @@ public class WilDataManager : MonoBehaviour {
 	public GameObject countdownManager;
 	public GameObject createButton;
 	public GameObject startButton;
+	public GameObject stopButton;
 	public int maxPoints;
 
 	private List<string> entries;
 
 	private const int readingTime = 30;
+	private const float threshold = 0.1f;
+	private const float filterFactor = 0.65f;
 
 	public Sprite countdown;
 	public Sprite countdownEnd;
@@ -40,20 +43,33 @@ public class WilDataManager : MonoBehaviour {
 		entries = new List<string>();
 
 		startButton.GetComponent<ButtonHandler> ().DisableClick ();
+		stopButton.GetComponent<ButtonHandler> ().DisableClick ();
 		GameData.data.GUIManager = gameObject;
 	}
 
 	public void startReadings() {
 		UnityEngine.Debug.Log ("Start readings");
 		createButton.GetComponent<ButtonHandler> ().DisableClick ();
+		stopButton.SetActive (true);
 		GetComponent<SpriteRenderer> ().sprite = countdown;
 		clientHandler.GetComponent<MeasureManager> ().ConnectAndReadData ();
 		countdownManager.GetComponent<CountdownManager> ().StartTimer();
 	}
 
+	public void StopReadings() {
+		UnityEngine.Debug.Log ("Countdown finished");
+		countdownManager.GetComponent<CountdownManager> ().StopTimer ();
+		clientHandler.GetComponent<MeasureManager> ().SetFinished (true);
+		stopButton.GetComponent<ButtonHandler> ().DisableClick ();
+		GetComponent<SpriteRenderer> ().sprite = countdownEnd;
+		entries = clientHandler.GetComponent<MeasureManager> ().GetEntries ();
+		countdownManager.GetComponent<CountdownManager> ().StartSecondTimer ();
+	}
+
 	public void EndReadings() {
 		UnityEngine.Debug.Log ("Countdown finished");
 		clientHandler.GetComponent<MeasureManager> ().SetFinished (true);
+		stopButton.GetComponent<ButtonHandler> ().DisableClick ();
 		GetComponent<SpriteRenderer> ().sprite = countdownEnd;
 		entries = clientHandler.GetComponent<MeasureManager> ().GetEntries ();
 		countdownManager.GetComponent<CountdownManager> ().StartSecondTimer ();
@@ -69,26 +85,62 @@ public class WilDataManager : MonoBehaviour {
 
 		GetComponent<SpriteRenderer> ().sprite = building;
 
+		List<float> xList = new List<float> ();
+		List<float> yList = new List<float> ();
 		List<int> moveX = new List<int> ();
 		List<int> moveY = new List<int> ();
 		List<int> posX = new List<int> ();
 		List<int> posY = new List<int> ();
 
+		LowPassFilter xFilter = new LowPassFilter (filterFactor);
+		LowPassFilter yFilter = new LowPassFilter (filterFactor);
+
 		int i = 0;
 		int j = 0;
 
 		string entry;
-		// (-1|0|1);(0|1) - format of the single entry in entries
+		// ax(f);ay(f) - format of the single entry in entries
 		for (i = 0; i < entries.Count; i++) {
 			entry = entries [i];
 			if (entry != null) {
 				string[] split = entry.Split (';');
-				// split[0] contains (-1|0|1); split[1] contains (0|1)
+				// split[0] contains ax; split[1] contains ay
 				UnityEngine.Debug.Log("x read: " + split[0]);
 				UnityEngine.Debug.Log ("y read: " + split [1]);
-				moveX.Add (int.Parse (split [0]));
-				moveY.Add (int.Parse (split [1]));
+				var ax = float.Parse (split [0]);
+				var ay = float.Parse (split [1]);
+				xList.Add (ax);
+				yList.Add (ay);
 			}
+		}
+
+		// filter the data
+		for (i = 0; i < xList.Count; i++) {
+			xList [i] = xFilter.Step (xList [i]);
+			yList [i] = yFilter.Step (yList [i]);
+		}
+
+		int movex, movey;
+		// convert data into motion detection values
+		for (i = 0; i < xList.Count; i++) {
+			// movex
+			if (xList [i] > threshold) {
+				movex = 1;
+			} else if (xList [i] < -threshold) {
+				movex = -1;
+			} else {
+				movex = 0;
+			}
+			//movey
+			if (yList [i] > threshold) {
+				movey = 1;
+			} else if (yList [i] < -threshold) {
+				movey = -1;
+			} else {
+				movey = 0;
+			}
+			moveX.Add (movex);
+			moveY.Add (movey);
 		}
 
 		// 1st operation: removes the (0,0) moves, which are not useful to evaluate the circuit
@@ -106,27 +158,20 @@ public class WilDataManager : MonoBehaviour {
 			
 		// 2nd operation: removes the unsupported change in direction, that are the ones
 		// that makes the player going back on its current path(180° curves)
+		// note: two movement vectors are opposite if their sum is vector (0,0)
 		removeIndex = new List<int>();
-		i = 0;
+		i = 1;
 		j = 0;
 
-		while (i < moveX.Count - 1) {
-			if (moveY [i] == 0 && moveX [i] != 0) {
-				for (j = i + 1; j < moveX.Count && moveY [j] == 0; j++)
-					if (moveX [j] == -moveX [i]) {
-						//moveX [j] = 0; <- this introduces 0,0 move
-						removeIndex.Add(j);
-					}
-				i = j;
-			} else if (moveX [i] == 0 && moveY [i] != 0) {
-				for (j = i + 1; j < moveX.Count && moveX [j] == 0; j++)
-					if (moveY [j] == -moveY [i]) {
-						//moveY [j] = 0; <- this introduces 0,0 move
-						removeIndex.Add(j);
-					}
-				i = j;
-			} else
-				i += 1;
+		while (i < moveX.Count) {
+			if ((moveX [i] + moveX [j] == 0) && (moveY [i] + moveY [j] == 0)) {
+				// i make an opposite movement wrt j -> remove i
+				removeIndex.Add (i);
+			} else {
+				// movements i and j aren't opposite, i is the new comparator
+				j = i;
+			}
+			i++;
 		}
 
 		removeIndex.Reverse ();
@@ -135,19 +180,40 @@ public class WilDataManager : MonoBehaviour {
 			moveY.RemoveAt (removeIndex [i]);
 		}
 
+		// 3rd operation: remove points in order to stay in the maximum number of tiles
 		maxPoints = GameData.data.maxNumberOfTiles;
+		int lastx = 0;
+		int lasty = 0;
+		if (moveX.Count > 0) {
+			lastx = moveX [0];
+			lasty = moveY [0];
+		}
+		bool bruteNeeded = false;
 
 		while (moveX.Count > maxPoints + 2) {
 			removeIndex = new List<int>();
+			// half the sub-paths in the same direction
+			for (i = 1; i < moveX.Count; i++) {
+				if (!bruteNeeded) {
+					if (moveX [i] == lastx && moveY [i] == lasty) {
+						removeIndex.Add (i);
+						i++;
+					}
+				} else {
+					// brutal half is needed
+					if (i % 2 == 0)
+						removeIndex.Add (i);
+				}
+			}
 
-			for (i = 0; i < moveX.Count; i++)
-				if (i % 2 == 0)
-					removeIndex.Add (i);
-
-			removeIndex.Reverse ();
-			for (i = 0; i < removeIndex.Count; i++) {
-				moveX.RemoveAt (removeIndex [i]);
-				moveY.RemoveAt (removeIndex [i]);
+			if (removeIndex.Count > 0) {
+				removeIndex.Reverse ();
+				for (i = 0; i < removeIndex.Count; i++) {
+					moveX.RemoveAt (removeIndex [i]);
+					moveY.RemoveAt (removeIndex [i]);
+				}
+			} else {
+				bruteNeeded = true;
 			}
 		}
 
@@ -155,18 +221,20 @@ public class WilDataManager : MonoBehaviour {
 		// the circuit always starts in the position (0,0)
 		posX.Add (0);
 		posY.Add (0);
-		int lastx = 0;
-		int lasty = 0;
+		lastx = 0;
+		lasty = 0;
 		int px = 0;
 		int py = 0;
 
 		for (i = 0; i < moveX.Count; i++) {
 			px = lastx + moveX [i];
 			py = lasty + moveY [i];
-			posX.Add (px);
-			posY.Add (py);
-			lastx = px;
-			lasty = py;
+			if (!PointAlreadyPresent (posX, posY, px, py)) {
+				posX.Add (px);
+				posY.Add (py);
+				lastx = px;
+				lasty = py;
+			}
 		}
 
 		// prints the circuit data in the new file
@@ -179,6 +247,16 @@ public class WilDataManager : MonoBehaviour {
 
 		GetComponent<SpriteRenderer> ().sprite = ready;
 		startButton.GetComponent<ButtonHandler> ().EnableClick ();
+	}
+
+	bool PointAlreadyPresent(List<int> xList, List<int> yList, int x, int y) {
+		bool found = false;
+		for (int i = 0; i < xList.Count && !found; i++) {
+			if (xList [i] == x && yList [i] == y) {
+				found = true;
+			}
+		}
+		return found;
 	}
 
 	public void startGame() {

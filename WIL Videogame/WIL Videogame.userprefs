@@ -1,13 +1,15 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/GameData.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/PlayerController.cs">
     <Files>
-      <File FileName="Assets/Scripts/GameData.cs" Line="17" Column="1" />
-      <File FileName="Assets/Scripts/CircuitManager.cs" Line="15" Column="31" />
-      <File FileName="Assets/Scripts/GameLoader.cs" Line="44" Column="27" />
-      <File FileName="Assets/Scripts/PlayerController.cs" Line="9" Column="27" />
-      <File FileName="Assets/Scripts/TimerManager.cs" Line="8" Column="19" />
-      <File FileName="Assets/Scripts/FlagHandler.cs" Line="10" Column="67" />
+      <File FileName="Assets/Scripts/ObstacleManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/PlayerController.cs" Line="31" Column="105" />
+      <File FileName="Assets/Scripts/TimerManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ObstacleGenerator.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Loading.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/GameLoader.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/GameData.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/FlagHandler.cs" Line="11" Column="89" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

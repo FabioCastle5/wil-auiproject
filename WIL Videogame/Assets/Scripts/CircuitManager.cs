@@ -11,10 +11,11 @@ public class CircuitManager : MonoBehaviour {
 	public Image advanceBar;
 	private float deltaXBar;
 	private float initialWidth;
+	private GameObject flagToBeDrawn;
 
 	private List<TileData> tiles;
 	private int nextTile;
-	private Queue<GameObject> activeTiles;
+	private List<GameObject> activeTiles;
 
 	private const float offsetUp45 = 3.47f;
 	private const int verticalOffset = 12;
@@ -41,10 +42,10 @@ public class CircuitManager : MonoBehaviour {
 				horizontal = true;
 			} else if (tiles [checkpointIndex].tileObject.name.Contains ("CurveNE") || tiles [checkpointIndex].tileObject.name.Contains ("CurveWN")) {
 				horizontal = true;
-				newX += 9f;
+				newX += 8.5f;
 			} else if (tiles [checkpointIndex].tileObject.name.Contains ("Curve")) {
 				horizontal = true;
-				newX -= 9f;
+				newX -= 8.5f;
 			}
 			Vector3 pos = new Vector3 (newX, newY, 0f);
 			if (horizontal) {
@@ -57,7 +58,7 @@ public class CircuitManager : MonoBehaviour {
 		yield return null;
 
 		// draw next tile
-		if (checkpointIndex >= 2)
+		if (checkpointIndex > 2)
 			DrawNextTile ();
 
 		yield return null;
@@ -82,7 +83,7 @@ public class CircuitManager : MonoBehaviour {
 
 	public void Reset () {
 		tiles = new List<TileData>();
-		activeTiles = new Queue<GameObject> (simultaneousTiles);
+		activeTiles = new List<GameObject> (simultaneousTiles);
 		initialDirection = 0;
 		nextTile = 0;
 	}
@@ -95,33 +96,70 @@ public class CircuitManager : MonoBehaviour {
 		return initialDirection;
 	}
 
+	public float GetInitialX () {
+		return tiles [0].x;
+	}
+
+	public float GetInitialY () {
+		return tiles [0].y;
+	}
+
 	public void DrawFinalFlag (GameObject flag) {
-		int i = 0;
-		while (i < tiles.Count - 1)
-			i++;
-		float x = tiles[i].x;
-		float y = tiles[i].y;
-		GameObject instance = Instantiate (flag, new Vector3(x,y,0f), flag.transform.rotation) as GameObject;
-		instance.GetComponent<BoxCollider2D> ().enabled = true;
+		flagToBeDrawn = flag;
 	}
 
 	public void DrawNextTile () {
 		if (nextTile < tiles.Count) {
 			Debug.Log ("Drawing a new tile");
-			GameObject oldTile = activeTiles.Dequeue ();
+			GameObject oldTile = activeTiles [0];
+			activeTiles.RemoveAt (0);
 			Destroy (oldTile);
+			// draw next tile only if it doesn't overlap any of the previous ones
 			TileData newTileData = tiles [nextTile];
-			GameObject newTile = Instantiate (newTileData.tileObject, new Vector3 (newTileData.x, newTileData.y, 0f), Quaternion.identity) as GameObject;
-			activeTiles.Enqueue (newTile);
-			nextTile++;
+			float oldx, oldy;
+			bool overlap = false;
+			for (int i = 0; i < activeTiles.Count && !overlap; i++) {
+				oldx = activeTiles [i].transform.position.x;
+				oldy = activeTiles [i].transform.position.y;
+				if (newTileData.x == oldx && newTileData.y == oldy)
+					overlap = true;
+			}
+			if (!overlap) {
+				GameObject newTile = Instantiate (newTileData.tileObject, new Vector3 (newTileData.x, newTileData.y, 0f), Quaternion.identity) as GameObject;
+				activeTiles.Add (newTile);
+				if (nextTile == tiles.Count - 1) {
+					// draw final flag
+					GameObject instance = Instantiate (flagToBeDrawn, new Vector3(newTileData.x,newTileData.y,0f), flagToBeDrawn.transform.rotation) as GameObject;
+					instance.GetComponent<BoxCollider2D> ().enabled = true;
+				}
+				nextTile++;
+			} else {
+				Debug.Log ("Overlap found: posticipating tile drawing");
+			}
 		}
 	}
 
 	public void StartDrawing () {
-		for (; nextTile < simultaneousTiles && nextTile < tiles.Count; nextTile++) {
+		for (; nextTile < simultaneousTiles && nextTile < tiles.Count;) {
+			// draw next tile only if it doesn't overlap any of the previous ones
 			TileData newTileData = tiles [nextTile];
-			GameObject newTile = Instantiate (newTileData.tileObject, new Vector3 (newTileData.x, newTileData.y, 0f), Quaternion.identity) as GameObject;
-			activeTiles.Enqueue (newTile);
+			float oldx, oldy;
+			bool overlap = false;
+			for (int i = 0; i < activeTiles.Count && !overlap; i++) {
+				oldx = activeTiles [i].transform.position.x;
+				oldy = activeTiles [i].transform.position.y;
+				if (newTileData.x == oldx && newTileData.y == oldy)
+					overlap = true;
+			}
+			Debug.Log ("Overlap: " + overlap);
+			if (!overlap) {
+				Debug.Log ("Drawing " + newTileData.tileObject.name + " at " + newTileData.x + " " + newTileData.y);
+				GameObject newTile = Instantiate (newTileData.tileObject, new Vector3 (newTileData.x, newTileData.y, 0f), Quaternion.identity) as GameObject;
+				activeTiles.Add (newTile);
+				nextTile++;
+			} else {
+				Debug.Log ("Overlap found: posticipating tile drawing");
+			}
 		}
 		SetCheckpoint ();
 	}
@@ -137,18 +175,27 @@ public class CircuitManager : MonoBehaviour {
 		Debug.Log ("Number of tiles: " + tiles.Count);
 		advanceBar.transform.localScale = new Vector3(proposition, 1f, 1f);
 		if (tiles.Count > 1) {
+			checkpointIndex = 1;
+			Debug.Log ("Tile: " + tiles [1].tileObject.name);
+			float newX = tiles [checkpointIndex].x;
+			float newY = tiles [checkpointIndex].y;
 			bool horizontal = false;
-			Vector3 pos = new Vector3 (tiles[1].x, tiles[1].y, 0f);
-			if (tiles [1].tileObject.name == "TileEW" || tiles [1].tileObject.name == "TileEW(Clone)") {
+			if (tiles [checkpointIndex].tileObject.name.Contains ("TileEW")) {
 				// must be rotated 90°
 				horizontal = true;
+			} else if (tiles [checkpointIndex].tileObject.name.Contains ("CurveNE") || tiles [checkpointIndex].tileObject.name.Contains ("CurveWN")) {
+				horizontal = true;
+				newX += 9f;
+			} else if (tiles [checkpointIndex].tileObject.name.Contains ("Curve")) {
+				horizontal = true;
+				newX -= 9f;
 			}
+			Vector3 pos = new Vector3 (newX, newY, 0f);
 			if (horizontal) {
 				Instantiate (hCheckpoint, pos, hCheckpoint.transform.rotation);
 			} else {
 				Instantiate (vCheckpoint, pos, vCheckpoint.transform.rotation);
 			}
-			checkpointIndex = 1;
 		}
 	}
 }

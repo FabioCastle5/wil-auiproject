@@ -29,10 +29,22 @@ public class ViewDataManager : MonoBehaviour {
 			UnityEngine.Debug.Log("Bad circuit: changing it");
 			CircuitData.data.xList.Clear ();
 			CircuitData.data.yList.Clear ();
-			for (int j = 0; j < 5; j++) {
-				CircuitData.data.xList.Add (j);
-				CircuitData.data.yList.Add (0);
-			}
+			CircuitData.data.xList.Add (0);
+			CircuitData.data.yList.Add (0);
+			CircuitData.data.xList.Add (1);
+			CircuitData.data.yList.Add (0);
+			CircuitData.data.xList.Add (1);
+			CircuitData.data.yList.Add (1);
+			CircuitData.data.xList.Add (0);
+			CircuitData.data.yList.Add (1);
+			CircuitData.data.xList.Add (0);
+			CircuitData.data.yList.Add (0);
+			CircuitData.data.xList.Add (-1);
+			CircuitData.data.yList.Add (-1);
+			CircuitData.data.xList.Add (-2);
+			CircuitData.data.yList.Add (0);
+			CircuitData.data.xList.Add (-2);
+			CircuitData.data.yList.Add (1);
 		}
 
 		List<int> circuitX = CircuitData.data.xList;
@@ -79,9 +91,18 @@ public class ViewDataManager : MonoBehaviour {
 				direction = 270;
 		}
 		int flagIndex = 0;
-		if (direction == 0 || direction == 180)
+		float xf = 0;
+		if (direction == 0 || direction == 180) {
 			flagIndex = 1;
-		GameObject flag = Instantiate (flags[flagIndex], Vector3.zero, flags[flagIndex].transform.rotation) as GameObject;
+		} else if (x0 < x1) {
+			// also y0 != y1 -> oblique right
+			xf += offsetUp45;
+		} else if (x0 > x1) {
+			// oblique but left
+			xf -= offsetUp45;
+		}
+		Vector3 pos = new Vector3 (xf, 0f, 0f);
+		GameObject flag = Instantiate (flags[flagIndex], pos, flags[flagIndex].transform.rotation) as GameObject;
 		flag.GetComponent<BoxCollider2D> ().enabled = false;
 	}
 

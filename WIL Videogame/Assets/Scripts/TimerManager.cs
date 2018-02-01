@@ -29,4 +29,8 @@ public class TimerManager : MonoBehaviour {
 	public void StopTimer () {
 		stop = true;
 	}
+
+	public void RestartGame() {
+		Application.LoadLevel (0);
+	}
 }

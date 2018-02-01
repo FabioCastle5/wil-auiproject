@@ -29,13 +29,16 @@ public class PlayerController : MonoBehaviour {
 		drawing = this.GetComponent<SpriteRenderer> ();
 
 		routeDirection = GameData.data.circuitMananger.GetComponent<CircuitManager> ().GetInitialDirection ();
-		offset = 0;
+		offset = - rotationAngle;
 		cos = 0f;
 		sin = 0f;
 		moving = false;
 	}
 
 	void Update () {
+		if (Input.GetMouseButtonDown (0)) {
+			ChangeDirection ();
+		}
 		if (moving) {
 			float newX = gameObject.transform.position.x + speed * Time.deltaTime * cos;
 			float newY = gameObject.transform.position.y + speed * Time.deltaTime * sin;
@@ -45,11 +48,9 @@ public class PlayerController : MonoBehaviour {
 
 	// make the player steer in the complementary direction
 	void ChangeDirection () {
-		if (!moving)
+		if (!moving) {
 			moving = true;
-		if (offset == 0) {
-			// at start, and at every change in the routeDirection
-			offset = - rotationAngle;
+			offset = -offset;
 		} else {
 			// the direction in inverted
 			offset = - offset;
@@ -92,23 +93,21 @@ public class PlayerController : MonoBehaviour {
 
 	public void SetRouteDirection (int direction) {
 		routeDirection = direction;
-		offset = 0;
+		offset = -offset;
 	}
 
 	public void StopMoving () {
 		moving = false;
-	}
-
-	void FixedUpdate () {
-		if (Input.GetMouseButtonDown (0)) {
-			ChangeDirection ();
-		}
 	}
 		
 	void OnTriggerEnter2D (Collider2D other) {
 		if (other.CompareTag ("Tile")) {
 			// the player is hitting a wall
 			moving = false;
+			// go back for a little
+			float newX = this.gameObject.transform.position.x - cos;
+			float newY = this.gameObject.transform.position.y - sin;
+			this.gameObject.transform.position = new Vector3 (newX, newY, 0f);
 		}
 	}
 }

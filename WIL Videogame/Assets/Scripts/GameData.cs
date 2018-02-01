@@ -14,9 +14,11 @@ public class GameData : MonoBehaviour {
 	public GameObject circuitMananger;
 	public GameObject player;
 	public GameObject timer;
+	public GameObject obstacleGenerator;
 
 	public Button startButton;
 	public Image finishScreen;
+	public Button restartButton;
 
 	// Singleton and data accessible from anywhere
 	void Awake () {
@@ -27,28 +29,6 @@ public class GameData : MonoBehaviour {
 		} else if (data != this) {
 			Destroy (gameObject);
 		}
-	}
-
-	public void SetPlayScene () {
-		sceneToBeLoaded = 2;
-		Application.LoadLevel (1);
-	}
-
-	public void SetCreateScene () {
-		sceneToBeLoaded = 3;
-		Application.LoadLevel (1);
-	}
-
-	public void SetSCircuit () {
-		maxNumberOfTiles = 6;
-	}
-
-	public void SetMCircuit () {
-		maxNumberOfTiles = 15;
-	}
-
-	public void SetLCircuit () {
-		maxNumberOfTiles = 25;
 	}
 
 	public void PauseGame () {

@@ -12,7 +12,7 @@ public class CameraManager : MonoBehaviour {
 	void Start () 
 	{
 		if (player != null)
-			offset = transform.position - player.transform.position;
+			offset = new Vector3(0f, 0f, transform.position.z - player.transform.position.z);
 	}
 
 	// LateUpdate is called after Update each frame
@@ -26,7 +26,7 @@ public class CameraManager : MonoBehaviour {
 
 	public void SetPlayer(GameObject p) {
 		player = p;
-		offset = transform.position - player.transform.position;
+		offset = new Vector3(0f, 0f, transform.position.z - player.transform.position.z);
 		Debug.Log ("Set player to be followed: " + player.name);
 	}
 }

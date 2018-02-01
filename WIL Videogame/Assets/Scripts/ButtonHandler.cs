@@ -4,8 +4,6 @@ using UnityEngine.UI;
 
 public class ButtonHandler : MonoBehaviour {
 
-	public GameObject receiver;
-
 	void Start () {
 		gameObject.GetComponent<Image> ().color = new Color (0, 0, 0, 0);
 	}

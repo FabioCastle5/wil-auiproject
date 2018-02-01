@@ -1,0 +1,41 @@
+WIL - MEASURE MOVEMENT Y POS
+MEASURE 1:
+Ax = -0.01		 | 		Ay = -0.00
+MEASURE 2:
+Ax = -0.01		 | 		Ay = -0.01
+MEASURE 3:
+Ax = -0.00		 | 		Ay = -0.01
+MEASURE 4:
+Ax = -0.01		 | 		Ay = -0.01
+MEASURE 5:
+Ax = -0.00		 | 		Ay = -0.00
+MEASURE 6:
+Ax = -0.01		 | 		Ay = -0.01
+MEASURE 7:
+Ax = -0.01		 | 		Ay = -0.01
+MEASURE 8:
+Ax = -0.01		 | 		Ay = -0.01
+MEASURE 9:
+Ax = -0.01		 | 		Ay = -0.01
+MEASURE 10:
+Ax = -0.00		 | 		Ay = -0.01
+MEASURE 11:
+Ax = -0.00		 | 		Ay = -0.01
+MEASURE 12:
+Ax = -0.01		 | 		Ay = 0.01
+MEASURE 13:
+Ax = 0.03		 | 		Ay = 0.16
+MEASURE 14:
+Ax = 0.02		 | 		Ay = -0.01
+MEASURE 15:
+Ax = -0.02		 | 		Ay = -0.05
+MEASURE 16:
+Ax = -0.02		 | 		Ay = -0.03
+MEASURE 17:
+Ax = -0.02		 | 		Ay = -0.03
+MEASURE 18:
+Ax = -0.02		 | 		Ay = -0.04
+MEASURE 19:
+Ax = -0.02		 | 		Ay = -0.04
+MEASURE 20:
+Ax = -0.02		 | 		Ay = -0.04
